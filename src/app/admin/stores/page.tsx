@@ -9,9 +9,9 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
   const editing = stores.find((store) => store.id === query.edit);
   return (
     <>
-      <PageIntro title="Shops" text="Name, store code, shop email and whether the shop can order." />
+      <PageIntro title="Shops" text="Manage store details and ordering access." />
       <Banner notice={query.notice} error={query.error} />
-      <form className="panel formGrid" action={saveStore}>
+      <form className="panel formGrid adminStoreForm" action={saveStore}>
         <input type="hidden" name="id" value={editing?.id || ""} />
         <label className="field">Store name<input name="name" defaultValue={editing?.name || ""} required /></label>
         <label className="field">Store code<input name="code" defaultValue={editing?.code || ""} inputMode="numeric" placeholder="Leave blank if unknown" /></label>
