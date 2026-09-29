@@ -319,3 +319,106 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
   .orderSheet td.productName .muted { font-size: 12px; }
   .orderSheet .qtyInput { width: 62px; min-height: 44px; font-size: 18px; padding: 6px; }
 }
+
+
+/* Professional application shell */
+:root {
+  --paper: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #17201b;
+  --muted: #68736c;
+  --line: #e3e8e5;
+  --red: #b91f26;
+  --red-dark: #95171d;
+  --sidebar: #111a16;
+  --shadow: 0 1px 2px rgba(17,26,22,.04), 0 8px 24px rgba(17,26,22,.05);
+}
+body { -webkit-font-smoothing: antialiased; }
+.workspace { background: var(--paper); min-height: 100vh; }
+.topbar {
+  min-height: 76px; padding: 0 30px; background: rgba(255,255,255,.92);
+  border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.topbar .eyebrow { margin-bottom: 1px; }
+.topbarIdentity { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.onlineDot { width: 8px; height: 8px; border-radius: 50%; background: #22a05a; box-shadow: 0 0 0 3px #e4f5eb; }
+.content { width: min(1240px, 100%); margin: 0 auto; padding: 28px 30px 56px; }
+aside { border-right: 1px solid rgba(255,255,255,.06); }
+aside nav a { min-height: 44px; }
+aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 var(--red); }
+.panel, .stat, .supplierCard, .authCard, .productRow, .history, .tableWrap { box-shadow: var(--shadow); }
+.pageIntro { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.pageIntro h1 { font-size: clamp(28px, 3vw, 38px); }
+.pageIntro p { margin: 4px 0 0; }
+.adminFeatureGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.adminFeatureCard {
+  display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px;
+  min-height: 104px; padding: 18px; background: white; border: 1px solid var(--line);
+  border-radius: 16px; text-decoration: none; box-shadow: var(--shadow); transition: transform .15s ease, border-color .15s ease;
+}
+.adminFeatureCard:hover { transform: translateY(-1px); border-color: #cbd4cf; }
+.featureIcon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: #f7e9ea; color: var(--red); }
+.featureCopy { min-width: 0; }
+.featureCopy b, .featureCopy small { display: block; }
+.featureCopy b { font-size: 17px; }
+.featureCopy small { color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.featureArrow { color: #9aa39e; }
+.officeBottomNav { display: none; }
+.shopHeader {
+  min-height: 78px; padding: 12px 20px; background: rgba(255,255,255,.94);
+  border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.shopIdentity { display: flex; align-items: center; gap: 11px; }
+.shopAvatar { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: var(--red); color: white; font-weight: 850; font-size: 18px; }
+.shopHeader h1 { font-size: 20px; letter-spacing: -.02em; }
+.shopHeader p { font-size: 12px; margin-top: 0; }
+.iconButton { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: white; }
+.bottomNav { grid-template-columns: repeat(2,1fr); z-index: 30; padding: 7px max(10px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); box-shadow: 0 -8px 24px rgba(17,26,22,.05); }
+.bottomNav a { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; padding: 7px; }
+.bottomNav a.active { background: transparent; color: var(--red); }
+.filters { padding: 16px; background: white; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.filters .button { min-width: 120px; }
+.subnav { padding: 5px; background: #e9eeeb; border-radius: 13px; width: fit-content; }
+.subnav a { border: 0; background: transparent; border-radius: 9px; padding: 9px 13px; }
+.subnav a.active { background: white; color: var(--ink); box-shadow: 0 1px 4px rgba(17,26,22,.08); }
+
+@media (max-width: 720px) {
+  body { background: var(--paper); }
+  .topbar { min-height: 64px; padding: 8px 16px; }
+  .topbarIdentity { font-size: 12px; }
+  .content { padding: 20px 14px 104px; }
+  .pageIntro { margin-bottom: 18px; }
+  .pageIntro h1 { font-size: 30px; }
+  .officeBottomNav {
+    display: grid; grid-template-columns: repeat(3,1fr); position: fixed; left: 0; right: 0; bottom: 0;
+    z-index: 40; background: rgba(255,255,255,.96); border-top: 1px solid var(--line);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 24px rgba(17,26,22,.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .officeBottomNav a, .officeBottomNav button {
+    min-height: 50px; border: 0; background: transparent; text-decoration: none; display: flex;
+    flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted);
+    font-size: 11px; font-weight: 750; border-radius: 10px;
+  }
+  .officeBottomNav a.active { color: var(--red); background: #fff1f1; }
+  .officeBottomNav form, .officeBottomNav button { width: 100%; }
+  .adminFeatureGrid { grid-template-columns: 1fr; gap: 10px; }
+  .adminFeatureCard { min-height: 82px; padding: 14px; grid-template-columns: 42px 1fr auto; border-radius: 14px; }
+  .featureIcon { width: 42px; height: 42px; border-radius: 12px; }
+  .featureCopy small { font-size: 12px; }
+  .subnav { width: 100%; overflow-x: auto; flex-wrap: nowrap; background: transparent; padding: 0; gap: 7px; }
+  .subnav a { background: white; border: 1px solid var(--line); }
+  .subnav a.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .filters { grid-template-columns: 1fr 1fr; padding: 12px; gap: 10px; margin-top: 10px; }
+  .filters .button { grid-column: 1/-1; }
+  .tableWrap { border-radius: 14px; }
+  .shopShell .content { padding-top: 18px; }
+  .shopHeader { padding-left: 14px; padding-right: 14px; }
+}
+@media (max-width: 430px) {
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters label.field { font-size: 12px; }
+  .filters input, .filters select { min-height: 46px; padding: 9px 10px; font-size: 15px; }
+}
