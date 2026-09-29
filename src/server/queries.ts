@@ -520,3 +520,57 @@ export async function listAudit() {
     metadata: (row.metadata && typeof row.metadata === "object" ? row.metadata : {}) as Record<string, unknown>,
   }));
 }
+
+export type MissingOrderRow = {
+  storeId: string;
+  storeName: string;
+  storeCode: string | null;
+  supplierId: string;
+  supplierName: string;
+  deadline: string | null;
+};
+
+export async function listMissingOrders(targetDate: string): Promise<MissingOrderRow[]> {
+  const [assignments, stores, suppliers, orders] = await Promise.all([
+    listAssignments(),
+    listStores(),
+    listSuppliers(),
+    db()
+      .from("orders")
+      .select("store_id, supplier_id, order_date, status")
+      .eq("order_date", targetDate)
+      .neq("status", "cancelled"),
+  ]);
+
+  const activeAssignments = assignments.filter((a) => a.active);
+  const storeMap = new Map(stores.map((s) => [s.id, s]));
+  const supplierMap = new Map(suppliers.map((s) => [s.id, s]));
+  const orderSet = new Set(
+    (orders.data ?? []).map((o) => `${o.store_id}|${o.supplier_id}`)
+  );
+
+  const missing: MissingOrderRow[] = [];
+
+  for (const assignment of activeAssignments) {
+    const key = `${assignment.storeId}|${assignment.supplierId}`;
+    const store = storeMap.get(assignment.storeId);
+    const supplier = supplierMap.get(assignment.supplierId);
+
+    if (store && supplier && store.active && supplier.active && !orderSet.has(key)) {
+      missing.push({
+        storeId: assignment.storeId,
+        storeName: store.name,
+        storeCode: store.code,
+        supplierId: assignment.supplierId,
+        supplierName: supplier.name,
+        deadline: assignment.orderDeadline,
+      });
+    }
+  }
+
+  return missing.sort((a, b) => {
+    const nameCompare = a.storeName.localeCompare(b.storeName);
+    if (nameCompare !== 0) return nameCompare;
+    return a.supplierName.localeCompare(b.supplierName);
+  });
+}

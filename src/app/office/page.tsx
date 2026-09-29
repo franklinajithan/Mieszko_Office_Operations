@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { OrderTable, PageIntro } from "@/components/ui";
 import { listOrders, listStores, listSuppliers } from "@/server/queries";
 
@@ -18,6 +19,11 @@ export default async function OfficeHome({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageIntro title="Orders" text="Every shop order." />
+      <div className="actions" style={{ marginBottom: 16 }}>
+        <Link className="button secondary" href="/office/missing">
+          View missing orders
+        </Link>
+      </div>
       <form className="filters" method="get">
         <label className="field">Shop
           <select name="store" defaultValue={query.store || ""}>
