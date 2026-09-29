@@ -643,3 +643,41 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .workspace .data td[data-label="Status"] { padding-top:8px; }
   .workspace .data .status { padding:7px 12px; border-radius:999px; font-size:12px; }
 }
+
+
+/* New order mobile alignment fix */
+@media (max-width:720px) {
+  .shopShell .newOrderForm {
+    width:100%;
+    box-sizing:border-box;
+    padding:18px 16px;
+    overflow:hidden;
+  }
+  .shopShell .newOrderForm .field,
+  .shopShell .newOrderForm .actions {
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  .shopShell .newOrderForm input,
+  .shopShell .newOrderForm select {
+    display:block;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  .shopShell .newOrderForm input[type="date"] {
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .shopShell .newOrderForm .button {
+    display:flex;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+  }
+}
