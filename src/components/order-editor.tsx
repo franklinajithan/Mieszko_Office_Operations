@@ -55,11 +55,11 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
     })), [orderedOnly, products, quantities, search, showPolish]);
 
   const columns = useMemo<ColDef<GridProduct>[]>(() => [
-    { field:"itemCode", headerName:"Item code", minWidth:110 },
-    { field:"ean", headerName:"EAN", minWidth:150 },
+    { field:"itemCode", headerName:"Item code", minWidth:110, hide: typeof window !== "undefined" && window.innerWidth <= 720 },
+    { field:"ean", headerName:"EAN", minWidth:145, hide: typeof window !== "undefined" && window.innerWidth <= 720 },
     { field:"supplierCode", headerName:"Supplier code", minWidth:125 },
-    { field:"name", headerName:"Product name", minWidth:340, flex:2.4, cellRenderer: ProductNameCell },
-    { field:"qty", headerName:"Qty", width:110, minWidth:110, maxWidth:110, flex:0, pinned:"right", editable:true, cellClass:"agQtyCell",
+    { field:"name", headerName:"Product name", minWidth:240, flex:2.4, cellRenderer: ProductNameCell },
+    { field:"qty", headerName:"Qty", width:92, minWidth:92, maxWidth:92, flex:0, pinned:"right", editable:true, cellClass:"agQtyCell",
       valueParser: p => { const n=Number(p.newValue); return Number.isInteger(n) && n > 0 ? n : 0; } }
   ], []);
 
