@@ -9,6 +9,7 @@ export type SupplierCard = { id: string; name: string };
 export type ProductRow = {
   id: string;
   name: string;
+  polishName: string | null;
   itemCode: string | null;
   ean: string | null;
   supplierCode: string | null;
@@ -190,6 +191,7 @@ function mapProduct(row: Record<string, unknown>): ProductRow {
   return {
     id: String(row.id),
     name: String(row.name ?? row.product_name ?? ""),
+    polishName: text(row.polish_name),
     itemCode: text(row.item_code),
     ean: text(row.ean) || text(row.barcode),
     supplierCode: text(row.supplier_code) || text(row.supplier_product_code),
@@ -203,7 +205,7 @@ function mapProduct(row: Record<string, unknown>): ProductRow {
 export async function listSupplierProducts(supplierId: string) {
   const { data, error } = await db()
     .from("products")
-    .select("id, name, item_code, barcode, ean, supplier_code, supplier_product_code, supplier_id, active, sort_order")
+    .select("id, name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code, supplier_id, active, sort_order")
     .eq("supplier_id", supplierId)
     .eq("active", true)
     .order("sort_order")
@@ -227,7 +229,7 @@ export async function listSupplierProducts(supplierId: string) {
 export async function listProducts(filters: { search?: string; supplierId?: string } = {}) {
   let query = db()
     .from("products")
-    .select("id, name, item_code, barcode, ean, supplier_code, supplier_product_code, supplier_id, active, sort_order, suppliers(name)")
+    .select("id, name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code, supplier_id, active, sort_order, suppliers(name)")
     .order("name");
   if (filters.supplierId) query = query.eq("supplier_id", filters.supplierId);
   const { data, error } = await query;
@@ -245,7 +247,7 @@ export async function listProducts(filters: { search?: string; supplierId?: stri
 function filterProducts(products: ProductRow[], search?: string) {
   const term = search?.trim().toLowerCase();
   if (!term) return products;
-  return products.filter((product) => [product.name, product.itemCode, product.ean, product.supplierCode]
+  return products.filter((product) => [product.name, product.polishName, product.itemCode, product.ean, product.supplierCode]
     .some((value) => value?.toLowerCase().includes(term)));
 }
 
