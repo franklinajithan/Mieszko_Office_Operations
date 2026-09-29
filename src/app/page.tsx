@@ -1,2 +1,2 @@
 import { createClient } from "@/lib/supabase/server";import { redirect } from "next/navigation";
-export default async function Home(){const s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect("/login");const {data:p}=await s.from("profiles").select("role,full_name,stores(name)").eq("user_id",user.id).single();if(!p)redirect("/login");if(p.role==="admin"||p.role==="office")redirect("/head-office");redirect("/shop");}
+export default async function Home(){const s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect("/login");const {data:p}=await s.from("profiles").select("role").eq("user_id",user.id).single();if(!p)redirect("/login");redirect(p.role==="admin"||p.role==="office"?"/head-office":"/shop");}
