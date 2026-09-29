@@ -23,6 +23,9 @@ export default async function OfficeHome({ searchParams }: { searchParams: Promi
         <Link className="button secondary" href="/office/missing">
           View missing orders
         </Link>
+        <Link className="button secondary" href="/office/consolidate">
+          Consolidate orders
+        </Link>
       </div>
       <form className="filters" method="get">
         <label className="field">Shop

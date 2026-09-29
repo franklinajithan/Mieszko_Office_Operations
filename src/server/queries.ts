@@ -530,6 +530,77 @@ export type MissingOrderRow = {
   deadline: string | null;
 };
 
+export type ConsolidationOrderLine = {
+  productId: string;
+  productName: string;
+  itemCode: string | null;
+  barcode: string | null;
+  caseSize: number;
+  storeId: string;
+  storeName: string;
+  storeCode: string | null;
+  quantity: number;
+};
+
+export async function getConsolidationData(params: {
+  supplierId: string;
+  orderDate?: string;
+  deliveryDate?: string;
+}): Promise<ConsolidationOrderLine[]> {
+  let query = db()
+    .from("orders")
+    .select(`
+      store_id,
+      stores!inner(name, code),
+      order_items!inner(
+        products!inner(id, name, item_code, barcode, case_size),
+        quantity
+      )
+    `)
+    .eq("supplier_id", params.supplierId)
+    .neq("status", "cancelled");
+
+  if (params.orderDate) {
+    query = query.eq("order_date", params.orderDate);
+  }
+  if (params.deliveryDate) {
+    query = query.eq("delivery_date", params.deliveryDate);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logServerError("consolidation data", error.message);
+    return [];
+  }
+
+  const lines: ConsolidationOrderLine[] = [];
+  
+  for (const order of data ?? []) {
+    const storeData = Array.isArray(order.stores) ? order.stores[0] : order.stores;
+    if (!storeData || !Array.isArray(order.order_items)) continue;
+
+    for (const item of order.order_items) {
+      const productData = Array.isArray(item.products) ? item.products[0] : item.products;
+      if (!productData || !item.quantity) continue;
+
+      lines.push({
+        productId: String(productData.id),
+        productName: String(productData.name),
+        itemCode: text(productData.item_code),
+        barcode: text(productData.barcode),
+        caseSize: Number(productData.case_size) || 1,
+        storeId: String(order.store_id),
+        storeName: String(storeData.name),
+        storeCode: text(storeData.code),
+        quantity: Number(item.quantity),
+      });
+    }
+  }
+
+  return lines;
+}
+
 export async function listMissingOrders(targetDate: string): Promise<MissingOrderRow[]> {
   const [assignments, stores, suppliers, orders] = await Promise.all([
     listAssignments(),
