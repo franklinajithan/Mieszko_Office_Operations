@@ -22,7 +22,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
           {editing && <Link className="button secondary" href="/admin/suppliers">Cancel</Link>}
         </div>
       </form>
-      <div className="panel" style={{ marginTop: 16 }}>
+      <div className="adminGrid">
         {suppliers.map((supplier) => (
           <div className="adminRow" key={supplier.id}>
             <div>
