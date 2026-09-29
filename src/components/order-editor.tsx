@@ -85,7 +85,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
       {products.length === 0 ? <div className="emptyState"><h2>No products yet</h2><p>No products have been assigned to this supplier yet.</p></div> :
        rows.length === 0 ? <div className="emptyState"><h2>No matches</h2><p>{orderedOnly ? "No products have a quantity yet." : "No products match your search."}</p></div> :
        <div className="ag-theme-quartz mieszkoGrid orderAgGrid" style={{height:Math.min(650, Math.max(300, 80 + rows.length * 42))}}>
-         <AgGridReact<GridProduct> rowData={rows} columnDefs={columns}
+         <AgGridReact<GridProduct> theme="legacy" rowData={rows} columnDefs={columns}
            defaultColDef={{sortable:true,filter:true,resizable:true,flex:1,minWidth:100}}
            rowHeight={50} headerHeight={40} animateRows={false} onCellValueChanged={changed}
            ensureDomOrder stopEditingWhenCellsLoseFocus />

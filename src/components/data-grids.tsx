@@ -26,6 +26,7 @@ export function MieszkoDataGrid({ rows, columns, height = 520 }: { rows: Row[]; 
   return (
     <div className="ag-theme-quartz mieszkoGrid" style={{ height }}>
       <AgGridReact<Row>
+        theme="legacy"
         rowData={rows}
         columnDefs={defs}
         defaultColDef={{ sortable: true, filter: true, resizable: true, flex: 1, minWidth: 105 }}
