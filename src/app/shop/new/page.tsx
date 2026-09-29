@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Banner, PageIntro } from "@/components/ui";
 import { storeLabel } from "@/lib/format";
 import { startOrder } from "@/server/actions/shop";
@@ -11,10 +10,9 @@ export default async function NewOrderPage({ searchParams }: { searchParams: Pro
   const suppliers = await listStoreSuppliers(staff.storeId);
   return (
     <>
-      <p><Link href="/shop">Shop home</Link></p>
-      <PageIntro title="New order" />
+      <PageIntro title="New order" text="Choose a supplier and delivery date to start." />
       <Banner error={query.error} />
-      <form className="panel formGrid" action={startOrder}>
+      <form className="panel formGrid newOrderForm" action={startOrder}>
         <label className="field">Shop
           <input value={storeLabel(staff.storeName, staff.storeCode)} readOnly />
         </label>
