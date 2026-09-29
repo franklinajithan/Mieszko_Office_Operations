@@ -962,3 +962,20 @@ html,body{width:100%;min-height:100%;margin:0}
 @media(max-width:900px){
  .workspace .content,.shopContent{padding:14px 12px 92px!important}
 }
+
+
+/* Shop ordering AG Grid */
+.orderAgGrid{width:100%;margin:0!important;--ag-row-height:50px}
+.orderAgGrid .ag-root-wrapper{border-radius:9px}
+.orderAgGrid .ag-header{border-bottom:1px solid #e2e6e3}
+.orderAgGrid .ag-pinned-right-header,.orderAgGrid .ag-pinned-right-cols-container{box-shadow:-1px 0 0 #e5e8e6}
+.orderAgGrid .orderProductCell{display:flex;flex-direction:column;justify-content:center;line-height:1.2;height:100%;overflow:hidden}
+.orderAgGrid .orderProductCell b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orderAgGrid .orderProductCell span{margin-top:3px;font-size:10.5px;color:#6f7973;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orderAgGrid .agQtyCell{justify-content:center;font-size:14px;font-weight:800;background:#fff}
+.orderAgGrid .agQtyCell.ag-cell-inline-editing{padding:0 8px;background:#fff8e8;border:1px solid #c9a64c}
+.orderEditor .toolbar{width:100%}
+.orderEditor .orderBar{width:100%;box-sizing:border-box}
+@media(max-width:720px){
+ .orderAgGrid .ag-root-wrapper{min-width:720px}
+}
