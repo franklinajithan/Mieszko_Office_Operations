@@ -68,3 +68,20 @@ export function UsersGrid({ users }: { users: any[] }) {
     {field:"name",headerName:"Name",minWidth:180,flex:1.5},{field:"role",headerName:"Role"},{field:"store",headerName:"Shop",minWidth:140},{field:"status",headerName:"Status",width:100,flex:0},{field:"last",headerName:"Last activity",minWidth:160},{field:"editHref"}
   ]} height={Math.min(560, 80 + Math.max(rows.length,5)*42)} />;
 }
+
+
+export function OrdersGrid({ orders, hrefBase, mode }: { orders: any[]; hrefBase: string; mode: "shop" | "office" }) {
+  const rows = orders.map(o => ({
+    shop:o.storeName || "—", supplier:o.supplierName, orderDate:o.orderDate, deliveryDate:o.deliveryDate,
+    products:o.products, qty:o.totalQty, email:o.emailStatus, sentBy:o.sentBy || (o.status === "draft" ? "—" : "Unknown"),
+    status:o.status, editHref:`${hrefBase}/${o.id}`
+  }));
+  const columns: ColDef<Row>[] = [
+    ...(mode === "office" ? [{field:"shop",headerName:"Shop",minWidth:140} as ColDef<Row>] : []),
+    {field:"supplier",headerName:"Supplier",minWidth:170,flex:1.5},{field:"orderDate",headerName:"Order date",minWidth:120},
+    {field:"deliveryDate",headerName:"Delivery date",minWidth:120},{field:"products",headerName:"Products",width:95,flex:0},
+    {field:"qty",headerName:"Qty",width:80,flex:0},{field:"email",headerName:"Email",minWidth:110},
+    {field:"sentBy",headerName:"Sent by",minWidth:130},{field:"status",headerName:"Status",width:105,flex:0},{field:"editHref"}
+  ];
+  return <MieszkoDataGrid rows={rows} columns={columns} height={Math.min(650, 80 + Math.max(rows.length,6)*42)} />;
+}
