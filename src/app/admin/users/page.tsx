@@ -51,7 +51,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           </form>
         </div>
       )}
-      <div className="panel" style={{ marginTop: 16 }}>
+      <div className="adminGrid">
         {users.map((user) => (
           <div className="adminRow" key={user.userId}>
             <div>
