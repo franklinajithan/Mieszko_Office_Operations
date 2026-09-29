@@ -1,1 +1,26 @@
-{"name":"mieszko-office-operations","version":"0.1.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"next lint"},"dependencies":{"next":"16.0.0","react":"19.2.0","react-dom":"19.2.0","lucide-react":"^0.468.0"},"devDependencies":{"@types/node":"^22","@types/react":"^19","@types/react-dom":"^19","typescript":"^5.7.2"}}
+{
+  "name": "mieszko-office-operations",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "16.0.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "lucide-react": "^0.468.0",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "resend": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5.7.2"
+  }
+}
