@@ -748,3 +748,43 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .shopContent > .actions { display:grid; grid-template-columns:1fr; }
   .shopContent > .actions .button { width:100%; }
 }
+
+
+/* Unified professional order-entry UI */
+.shopContent .orderPageHead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:18px}
+.orderPageHead .backLink{font-size:13px;color:var(--muted);text-decoration:none;font-weight:700}
+.orderPageHead .backLink:hover{color:var(--red)}
+.orderPageHead h1{font-size:26px;margin:8px 0 2px;letter-spacing:-.025em}
+.orderPageHead p{margin:0;color:var(--muted);font-size:14px}
+.orderEditor{display:grid;gap:14px}
+.orderEditor .toolbar{margin:0;display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:10px;align-items:center}
+.orderEditor .searchInput{height:44px;min-height:44px;border-color:var(--line);box-shadow:0 1px 2px rgba(17,26,22,.02)}
+.orderEditor .segmented{height:44px;border-color:var(--line);border-radius:10px}
+.orderEditor .segmented button{min-height:42px;padding:0 14px;font-size:13px;color:var(--muted);border-right:1px solid var(--line)}
+.orderEditor .segmented button:last-child{border-right:0}
+.orderEditor .segmented button.on{background:#202a25;color:#fff}
+.orderEditor .tableWrap{border-radius:14px;box-shadow:0 1px 2px rgba(17,26,22,.04);overflow:auto}
+.orderEditor .orderTable th{background:#f8faf9;padding:11px 14px;font-size:10px;color:#748078}
+.orderEditor .orderTable td{padding:12px 14px;font-size:13px}
+.orderEditor .orderTable td.productName{font-weight:600}
+.orderEditor .orderTable td.productName b{font-size:14px}
+.orderEditor .orderTable td.productName .muted{font-size:12px;font-weight:500}
+.orderEditor .qtyInput{width:72px;min-height:40px;height:40px;border-radius:9px;font-size:16px;border-color:var(--line)}
+.orderEditor .orderBar{position:sticky;bottom:16px;margin:0;border-radius:13px;padding:10px 12px;box-shadow:0 8px 28px rgba(17,26,22,.10)}
+.orderEditor .orderBar b{font-size:13px}
+.orderEditor .orderBar span{font-size:12px}
+.orderEditor .orderBar .button{min-height:42px;padding:9px 16px;font-size:13px}
+
+@media (min-width:901px){
+ .shopContent{max-width:1180px}
+ .shopContent .orderEditor .orderSheet{max-height:calc(100vh - 300px)}
+ .shopContent .orderEditor .orderTable thead th{top:0}
+}
+@media (max-width:900px){
+ .shopContent .orderPageHead{display:block;margin-bottom:14px}
+ .orderPageHead h1{font-size:23px}
+ .orderEditor .toolbar{grid-template-columns:1fr}
+ .orderEditor .segmented{width:100%;display:grid;grid-template-columns:1fr 1fr 1.2fr;height:auto}
+ .orderEditor .segmented button{padding:8px 5px;min-height:42px;font-size:12px}
+ .orderEditor .orderBar{bottom:76px}
+}
