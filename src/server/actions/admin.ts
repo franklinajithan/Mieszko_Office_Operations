@@ -282,6 +282,7 @@ export async function saveProduct(formData: FormData) {
   const id = String(formData.get("id") || "");
   const name = String(formData.get("name") || "").trim();
   const supplierId = String(formData.get("supplier_id") || "");
+  const polishName = String(formData.get("polish_name") || "").trim() || null;
   const active = formData.get("active") === "on";
   if (name.length < 2) go("/admin/products", "error", "name");
   if (!supplierId) go("/admin/products", "error", "supplier");
@@ -290,6 +291,7 @@ export async function saveProduct(formData: FormData) {
   const supplierCode = String(formData.get("supplier_code") || "").trim() || null;
   const payload = {
     name,
+    polish_name: polishName,
     supplier_id: supplierId,
     item_code: itemCode,
     barcode: ean,
