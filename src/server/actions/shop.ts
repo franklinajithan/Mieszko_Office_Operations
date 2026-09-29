@@ -53,6 +53,10 @@ export async function saveOrderLine(orderId: string, productId: string, quantity
   const payload = {
     quantity,
     cases: quantity,
+    case_size: 1,
+    case_quantity: quantity,
+    case_size_snapshot: 1,
+    total_units: quantity,
     item_code_snapshot: product.itemCode,
     ean_snapshot: product.ean,
     supplier_code_snapshot: product.supplierCode,
@@ -65,9 +69,9 @@ export async function saveOrderLine(orderId: string, productId: string, quantity
     } else {
       const inserted = await db().from("order_items").insert({ order_id: orderId, product_id: productId, ...payload }).select("id");
       if (inserted.error) {
-        const retry = await db().from("order_items").insert({ order_id: orderId, product_id: productId, cases: quantity, quantity });
+        const retry = await db().from("order_items").insert({ order_id: orderId, product_id: productId, cases: quantity, case_size: 1, quantity });
         if (retry.error) {
-          const casesOnly = await db().from("order_items").insert({ order_id: orderId, product_id: productId, cases: quantity });
+          const casesOnly = await db().from("order_items").insert({ order_id: orderId, product_id: productId, cases: quantity, case_size: 1 });
           if (casesOnly.error) return { error: "Unable to update the order. Please try again." };
         }
       }
