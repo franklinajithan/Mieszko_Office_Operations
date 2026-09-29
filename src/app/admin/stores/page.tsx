@@ -22,7 +22,7 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
           {editing && <Link className="button secondary" href="/admin/stores">Cancel</Link>}
         </div>
       </form>
-      <div className="panel" style={{ marginTop: 16 }}>
+      <div className="adminGrid">
         {stores.map((store) => (
           <div className="adminRow" key={store.id}>
             <div>
