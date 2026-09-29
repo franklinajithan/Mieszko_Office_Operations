@@ -547,3 +547,21 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .authCard { padding: 26px 22px; }
   .authCard h1 { font-size: 28px; }
 }
+
+
+/* Login CTA spacing */
+.authCard button[type="submit"] {
+  width: 100%;
+  min-height: 62px;
+  margin-top: 24px;
+  font-size: 18px;
+  font-weight: 800;
+}
+@media (max-width: 720px) {
+  .authCard button[type="submit"] {
+    min-height: 64px;
+    margin-top: 26px;
+    font-size: 19px;
+    border-radius: 14px;
+  }
+}
