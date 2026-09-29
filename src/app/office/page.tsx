@@ -17,7 +17,7 @@ export default async function OfficeHome({ searchParams }: { searchParams: Promi
   ]);
   return (
     <>
-      <PageIntro title="Orders" text="Every shop order." />
+      <PageIntro title="Orders" text="View and manage shop orders." />
       <form className="filters" method="get">
         <label className="field">Shop
           <select name="store" defaultValue={query.store || ""}>
