@@ -61,6 +61,7 @@ export type OrderListItem = {
   supplierName: string;
   products: number;
   totalQty: number;
+  sentBy: string | null;
 };
 export type StoreRow = { id: string; name: string; code: string | null; email: string | null; active: boolean };
 export type SupplierRow = {
@@ -260,8 +261,8 @@ export async function getProduct(id: string) {
   return mapProduct(chosen.data as Record<string, unknown>);
 }
 
-const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, created_at, store_id, supplier_id, stores(name, code, email), suppliers(name, order_email, cc_emails), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, item_code, barcode, ean, supplier_code, supplier_product_code))";
-const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, item_code, barcode, supplier_product_code))";
+const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email), suppliers(name, order_email, cc_emails), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, item_code, barcode, ean, supplier_code, supplier_product_code))";
+const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, item_code, barcode, supplier_product_code))";
 
 function mapOrder(row: Record<string, unknown>): OrderDetail | null {
   const store = one(row.stores as Embedded<{ name?: string; code?: string | null; email?: string | null }>);
@@ -319,6 +320,7 @@ function toListItem(order: OrderDetail): OrderListItem {
     supplierName: order.supplierName,
     products: order.products,
     totalQty: order.totalQty,
+    sentBy: null,
   };
 }
 
@@ -344,13 +346,26 @@ async function selectOrders(filters: { storeId?: string; supplierId?: string; da
   return basic.data ?? [];
 }
 
+async function attachSentBy(items: OrderListItem[]) {
+  const ids = [...new Set(items.map((item) => item.status === "submitted" ? item.id : "").filter(Boolean))];
+  if (!ids.length) return items;
+  const { data } = await db().from("orders").select("id, submitted_by, created_by").in("id", ids);
+  const userIds = [...new Set((data ?? []).flatMap((row) => [row.submitted_by, row.created_by]).filter(Boolean).map(String))];
+  if (!userIds.length) return items;
+  const { data: profiles } = await db().from("profiles").select("user_id, full_name").in("user_id", userIds);
+  const names = new Map((profiles ?? []).map((row) => [String(row.user_id), String(row.full_name || "")]));
+  const actors = new Map((data ?? []).map((row) => [String(row.id), names.get(String(row.submitted_by || row.created_by || "")) || null]));
+  return items.map((item) => ({ ...item, sentBy: actors.get(item.id) ?? null }));
+}
+
 export async function listOrders(filters: { storeId?: string; supplierId?: string; date?: string; deliveryDate?: string; status?: string; emailStatus?: string; limit?: number }) {
   const data = await selectOrders(filters);
-  return data
+  const items = data
     .map((row) => mapOrder(row as unknown as Record<string, unknown>))
     .filter((order): order is OrderDetail => Boolean(order))
     .map(toListItem)
     .sort((a, b) => (b.submittedAt || b.orderDate).localeCompare(a.submittedAt || a.orderDate));
+  return attachSentBy(items);
 }
 
 export async function getOrder(id: string) {
