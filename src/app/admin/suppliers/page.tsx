@@ -10,16 +10,17 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
   const editing = suppliers.find((supplier) => supplier.id === query.edit);
   return (
     <>
-      <PageIntro title="Suppliers" text="Orders are emailed to the supplier. The shop email receives a copy." />
+      <PageIntro title="Suppliers" text="Add a supplier or select Edit below to update its order email and CC addresses." />
       <Banner notice={query.notice} error={query.error} />
       <form className="panel formGrid" action={saveSupplier}>
+        <div className="wide"><h2 style={{margin:"0 0 4px"}}>{editing ? `Edit supplier — ${editing.name}` : "Add supplier"}</h2>{!editing && <p className="muted" style={{margin:0}}>Create a new supplier here. To change an existing supplier, tap Edit in the list below.</p>}</div>
         <input type="hidden" name="id" value={editing?.id || ""} />
         <label className="field">Name<input name="name" defaultValue={editing?.name || ""} required /></label>
         <label className="field">Order email<input name="order_email" type="email" defaultValue={editing?.orderEmail || ""} /></label>
         <label className="field wide">CC emails<input name="cc_emails" defaultValue={editing?.ccEmails.join(", ") || ""} placeholder="optional@supplier.co.uk" /></label>
         <label className="check"><input type="checkbox" name="active" defaultChecked={editing ? editing.active : true} /> Active</label>
         <div className="actions wide">
-          <button className="button primary" type="submit">{editing ? "Save supplier" : "Add supplier"}</button>
+          <button className="button primary" type="submit">{editing ? "Save changes" : "Add supplier"}</button>
           {editing && <Link className="button secondary" href="/admin/suppliers">Cancel</Link>}
         </div>
       </form>
