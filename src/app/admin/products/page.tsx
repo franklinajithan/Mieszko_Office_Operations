@@ -26,7 +26,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       </form>
       <form className="panel formGrid" action={saveProduct}>
         <input type="hidden" name="id" value={editing?.id || ""} />
-        <label className="field">Product name<input name="name" defaultValue={editing?.name || ""} required /></label>
+        <label className="field">English product name<input name="name" defaultValue={editing?.name || ""} required /></label>
+        <label className="field">Polish product name<input name="polish_name" defaultValue={editing?.polishName || ""} /></label>
         <label className="field">Supplier
           <select name="supplier_id" defaultValue={editing?.supplierId || query.supplier || ""} required>
             <option value="">Choose</option>
