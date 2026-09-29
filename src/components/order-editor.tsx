@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent, type ICellRendererParams, type CellKeyDownEvent } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent, type ICellRendererParams, type CellKeyDownEvent, type ICellEditorParams } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -17,6 +17,10 @@ export type EditorProduct = {
 };
 
 type GridProduct = EditorProduct & { qty: number; showPolish: boolean };
+
+function NumericQtyEditor({ value, onValueChange }: ICellEditorParams<GridProduct, number> & { onValueChange?: (value: number) => void }) {
+  return <input className="mobileQtyEditor" type="number" inputMode="numeric" pattern="[0-9]*" min="0" step="1" enterKeyHint="next" autoFocus defaultValue={Number(value) || 0} onChange={e => onValueChange?.(Math.max(0, parseInt(e.target.value || "0", 10) || 0))} />;
+}
 
 function ProductNameCell({ data }: ICellRendererParams<GridProduct>) {
   if (!data) return null;
@@ -59,7 +63,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
     { field:"ean", headerName:"EAN", minWidth:145, hide: typeof window !== "undefined" && window.innerWidth <= 720 },
     { field:"supplierCode", headerName:"Supplier code", width:105, minWidth:90, maxWidth:120, flex:0 },
     { field:"name", headerName:"Product name", minWidth:180, flex:1, cellRenderer: ProductNameCell },
-    { field:"qty", headerName:"Qty", width:76, minWidth:76, maxWidth:76, flex:0, pinned:"right", editable:true, cellClass:"agQtyCell",
+    { field:"qty", headerName:"Qty", width:76, minWidth:76, maxWidth:76, flex:0, pinned:"right", editable:true, singleClickEdit:true, cellEditor: NumericQtyEditor, cellClass:"agQtyCell",
       valueParser: p => { const n=Number(p.newValue); return Number.isInteger(n) && n > 0 ? n : 0; } }
   ], []);
 
