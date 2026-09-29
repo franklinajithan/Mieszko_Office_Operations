@@ -322,12 +322,24 @@ function toListItem(order: OrderDetail): OrderListItem {
   };
 }
 
-async function selectOrders(filters: { storeId?: string; supplierId?: string; date?: string; deliveryDate?: string; status?: string; emailStatus?: string; limit?: number }) {
+async function selectOrders(filters: { 
+  storeId?: string; 
+  supplierId?: string; 
+  date?: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+  deliveryDate?: string; 
+  status?: string; 
+  emailStatus?: string; 
+  limit?: number 
+}) {
   const run = (columns: string, includeDelivery: boolean) => {
     let query = db().from("orders").select(columns).order("order_date", { ascending: false }).limit(filters.limit ?? 200);
     if (filters.storeId) query = query.eq("store_id", filters.storeId);
     if (filters.supplierId) query = query.eq("supplier_id", filters.supplierId);
     if (filters.date) query = query.eq("order_date", filters.date);
+    if (filters.dateFrom) query = query.gte("order_date", filters.dateFrom);
+    if (filters.dateTo) query = query.lte("order_date", filters.dateTo);
     if (includeDelivery && filters.deliveryDate) query = query.eq("delivery_date", filters.deliveryDate);
     if (filters.status) query = query.eq("status", filters.status);
     if (includeDelivery && filters.emailStatus) query = query.eq("email_status", filters.emailStatus);
@@ -344,7 +356,17 @@ async function selectOrders(filters: { storeId?: string; supplierId?: string; da
   return basic.data ?? [];
 }
 
-export async function listOrders(filters: { storeId?: string; supplierId?: string; date?: string; deliveryDate?: string; status?: string; emailStatus?: string; limit?: number }) {
+export async function listOrders(filters: { 
+  storeId?: string; 
+  supplierId?: string; 
+  date?: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+  deliveryDate?: string; 
+  status?: string; 
+  emailStatus?: string; 
+  limit?: number 
+}) {
   const data = await selectOrders(filters);
   return data
     .map((row) => mapOrder(row as unknown as Record<string, unknown>))
@@ -521,4 +543,313 @@ export async function listAudit() {
     createdAt: String(row.created_at),
     metadata: (row.metadata && typeof row.metadata === "object" ? row.metadata : {}) as Record<string, unknown>,
   }));
+}
+
+export type MissingOrderRow = {
+  storeId: string;
+  storeName: string;
+  storeCode: string | null;
+  supplierId: string;
+  supplierName: string;
+  deadline: string | null;
+};
+
+export type ConsolidationOrderLine = {
+  productId: string;
+  productName: string;
+  itemCode: string | null;
+  barcode: string | null;
+  caseSize: number;
+  storeId: string;
+  storeName: string;
+  storeCode: string | null;
+  quantity: number;
+};
+
+export async function getConsolidationData(params: {
+  supplierId: string;
+  orderDate?: string;
+  deliveryDate?: string;
+}): Promise<ConsolidationOrderLine[]> {
+  let query = db()
+    .from("orders")
+    .select(`
+      store_id,
+      stores!inner(name, code),
+      order_items!inner(
+        products!inner(id, name, item_code, barcode, case_size),
+        quantity
+      )
+    `)
+    .eq("supplier_id", params.supplierId)
+    .neq("status", "cancelled");
+
+  if (params.orderDate) {
+    query = query.eq("order_date", params.orderDate);
+  }
+  if (params.deliveryDate) {
+    query = query.eq("delivery_date", params.deliveryDate);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logServerError("consolidation data", error.message);
+    return [];
+  }
+
+  const lines: ConsolidationOrderLine[] = [];
+  
+  for (const order of data ?? []) {
+    const storeData = Array.isArray(order.stores) ? order.stores[0] : order.stores;
+    if (!storeData || !Array.isArray(order.order_items)) continue;
+
+    for (const item of order.order_items) {
+      const productData = Array.isArray(item.products) ? item.products[0] : item.products;
+      if (!productData || !item.quantity) continue;
+
+      lines.push({
+        productId: String(productData.id),
+        productName: String(productData.name),
+        itemCode: text(productData.item_code),
+        barcode: text(productData.barcode),
+        caseSize: Number(productData.case_size) || 1,
+        storeId: String(order.store_id),
+        storeName: String(storeData.name),
+        storeCode: text(storeData.code),
+        quantity: Number(item.quantity),
+      });
+    }
+  }
+
+  return lines;
+}
+
+export type OrderStats = {
+  totalOrders: number;
+  draftOrders: number;
+  submittedOrders: number;
+  cancelledOrders: number;
+  totalProducts: number;
+  totalQuantity: number;
+  storeCount: number;
+  supplierCount: number;
+};
+
+export async function getOrderStats(params: {
+  startDate?: string;
+  endDate?: string;
+  storeId?: string;
+  supplierId?: string;
+}): Promise<OrderStats> {
+  let ordersQuery = db()
+    .from("orders")
+    .select("id, status, store_id, supplier_id", { count: "exact" });
+
+  let itemsQuery = db()
+    .from("orders")
+    .select(`
+      order_items!inner(quantity, product_id)
+    `);
+
+  if (params.startDate) {
+    ordersQuery = ordersQuery.gte("order_date", params.startDate);
+    itemsQuery = itemsQuery.gte("order_date", params.startDate);
+  }
+  if (params.endDate) {
+    ordersQuery = ordersQuery.lte("order_date", params.endDate);
+    itemsQuery = itemsQuery.lte("order_date", params.endDate);
+  }
+  if (params.storeId) {
+    ordersQuery = ordersQuery.eq("store_id", params.storeId);
+    itemsQuery = itemsQuery.eq("store_id", params.storeId);
+  }
+  if (params.supplierId) {
+    ordersQuery = ordersQuery.eq("supplier_id", params.supplierId);
+    itemsQuery = itemsQuery.eq("supplier_id", params.supplierId);
+  }
+
+  const [ordersResult, itemsResult] = await Promise.all([
+    ordersQuery,
+    itemsQuery,
+  ]);
+
+  const orders = ordersResult.data ?? [];
+  const draftOrders = orders.filter((o) => o.status === "draft").length;
+  const submittedOrders = orders.filter((o) => o.status === "submitted").length;
+  const cancelledOrders = orders.filter((o) => o.status === "cancelled").length;
+  const storeIds = new Set(orders.map((o) => o.store_id));
+  const supplierIds = new Set(orders.map((o) => o.supplier_id));
+
+  let totalProducts = 0;
+  let totalQuantity = 0;
+  const productIds = new Set<string>();
+
+  for (const order of itemsResult.data ?? []) {
+    if (!Array.isArray(order.order_items)) continue;
+    for (const item of order.order_items) {
+      if (item.product_id) productIds.add(String(item.product_id));
+      totalQuantity += Number(item.quantity) || 0;
+    }
+  }
+
+  totalProducts = productIds.size;
+
+  return {
+    totalOrders: orders.length,
+    draftOrders,
+    submittedOrders,
+    cancelledOrders,
+    totalProducts,
+    totalQuantity,
+    storeCount: storeIds.size,
+    supplierCount: supplierIds.size,
+  };
+}
+
+export type ProductOrderSummary = {
+  productId: string;
+  productName: string;
+  itemCode: string | null;
+  ean: string | null;
+  supplierName: string;
+  caseSize: number;
+  totalOrders: number;
+  totalQuantity: number;
+  lastOrderDate: string | null;
+};
+
+export async function getProductOrderSummary(params: {
+  startDate?: string;
+  endDate?: string;
+  supplierId?: string;
+}): Promise<ProductOrderSummary[]> {
+  let query = db()
+    .from("products")
+    .select(`
+      id,
+      name,
+      item_code,
+      barcode,
+      case_size,
+      supplier_id,
+      suppliers!inner(name),
+      order_items!left(
+        quantity,
+        orders!inner(order_date, status)
+      )
+    `)
+    .eq("active", true);
+
+  if (params.supplierId) {
+    query = query.eq("supplier_id", params.supplierId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logServerError("product order summary", error.message);
+    return [];
+  }
+
+  const results: ProductOrderSummary[] = [];
+
+  for (const product of data ?? []) {
+    const supplierData = Array.isArray(product.suppliers)
+      ? product.suppliers[0]
+      : product.suppliers;
+    const orderItems = Array.isArray(product.order_items)
+      ? product.order_items
+      : [];
+
+    let totalQuantity = 0;
+    let orderCount = 0;
+    let lastOrderDate: string | null = null;
+    const orderDates: string[] = [];
+
+    for (const item of orderItems) {
+      const orderData = Array.isArray(item.orders) ? item.orders[0] : item.orders;
+      if (!orderData || orderData.status === "cancelled") continue;
+
+      const orderDate = String(orderData.order_date);
+      
+      if (params.startDate && orderDate < params.startDate) continue;
+      if (params.endDate && orderDate > params.endDate) continue;
+
+      totalQuantity += Number(item.quantity) || 0;
+      orderCount++;
+      orderDates.push(orderDate);
+    }
+
+    if (orderDates.length > 0) {
+      orderDates.sort();
+      lastOrderDate = orderDates[orderDates.length - 1];
+    }
+
+    if (orderCount > 0 || !params.startDate) {
+      results.push({
+        productId: String(product.id),
+        productName: String(product.name),
+        itemCode: text(product.item_code),
+        ean: text(product.barcode),
+        supplierName: supplierData ? String(supplierData.name) : "",
+        caseSize: Number(product.case_size) || 1,
+        totalOrders: orderCount,
+        totalQuantity,
+        lastOrderDate,
+      });
+    }
+  }
+
+  return results.sort((a, b) => {
+    if (a.totalQuantity !== b.totalQuantity) {
+      return b.totalQuantity - a.totalQuantity;
+    }
+    return a.productName.localeCompare(b.productName);
+  });
+}
+
+export async function listMissingOrders(targetDate: string): Promise<MissingOrderRow[]> {
+  const [assignments, stores, suppliers, orders] = await Promise.all([
+    listAssignments(),
+    listStores(),
+    listSuppliers(),
+    db()
+      .from("orders")
+      .select("store_id, supplier_id, order_date, status")
+      .eq("order_date", targetDate)
+      .neq("status", "cancelled"),
+  ]);
+
+  const activeAssignments = assignments.filter((a) => a.active);
+  const storeMap = new Map(stores.map((s) => [s.id, s]));
+  const supplierMap = new Map(suppliers.map((s) => [s.id, s]));
+  const orderSet = new Set(
+    (orders.data ?? []).map((o) => `${o.store_id}|${o.supplier_id}`)
+  );
+
+  const missing: MissingOrderRow[] = [];
+
+  for (const assignment of activeAssignments) {
+    const key = `${assignment.storeId}|${assignment.supplierId}`;
+    const store = storeMap.get(assignment.storeId);
+    const supplier = supplierMap.get(assignment.supplierId);
+
+    if (store && supplier && store.active && supplier.active && !orderSet.has(key)) {
+      missing.push({
+        storeId: assignment.storeId,
+        storeName: store.name,
+        storeCode: store.code,
+        supplierId: assignment.supplierId,
+        supplierName: supplier.name,
+        deadline: assignment.orderDeadline,
+      });
+    }
+  }
+
+  return missing.sort((a, b) => {
+    const nameCompare = a.storeName.localeCompare(b.storeName);
+    if (nameCompare !== 0) return nameCompare;
+    return a.supplierName.localeCompare(b.supplierName);
+  });
 }
