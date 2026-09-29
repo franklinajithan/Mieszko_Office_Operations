@@ -28,7 +28,11 @@ export function sendBlockReason(input: {
 }
 
 export function orderSubject(shop: string, supplier: string, deliveryDateLabel: string) {
-  return `Mieszko ${shop} - ${supplier} Order - Delivery ${deliveryDateLabel}`;
+  return `Mieszko Order - ${shop} - ${supplier} - Delivery ${deliveryDateLabel}`;
+}
+
+export function shopCopySubject(shop: string, supplier: string, deliveryDateLabel: string) {
+  return `Copy: ${orderSubject(shop, supplier, deliveryDateLabel)}`;
 }
 
 export function productMatches(product: {

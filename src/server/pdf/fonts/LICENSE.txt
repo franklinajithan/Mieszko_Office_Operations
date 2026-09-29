@@ -1,0 +1,3 @@
+Roboto is used to draw Polish characters in order PDFs.
+It is licensed under the Apache License, Version 2.0.
+Source: https://github.com/googlefonts/roboto

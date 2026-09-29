@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SubmitButton } from "@/components/controls";
 import { Banner, StatusBadge } from "@/components/ui";
-import { emailStatusLabel, formatUkDate, formatUkDateTime, storeLabel } from "@/lib/format";
-import { resendOrderEmail } from "@/server/actions/office";
-import { getOrder } from "@/server/queries";
+import { formatUkDate, formatUkDateTime, storeLabel } from "@/lib/format";
+import { canResendShopCopy, canResendSupplier, shopCopyLabel, supplierChannelLabel } from "@/lib/order-email-status";
+import { resendShopCopy, resendSupplierEmail } from "@/server/actions/office";
+import { getOrder, listOrderEmailLogs } from "@/server/queries";
 
 export default async function OfficeOrderDetail({
   params,
@@ -17,6 +18,9 @@ export default async function OfficeOrderDetail({
   const query = await searchParams;
   const order = await getOrder(orderId);
   if (!order) notFound();
+  const logs = await listOrderEmailLogs(order.id);
+  const supplierEmail = supplierChannelLabel(order.emailStatus, logs);
+  const shopCopy = shopCopyLabel(order.storeEmail, logs);
   return (
     <article>
       <h1>{order.supplierName}</h1>
@@ -28,7 +32,8 @@ export default async function OfficeOrderDetail({
         Order created: {formatUkDate(order.orderDate)}<br />
         Delivery date: {formatUkDate(order.deliveryDate)}<br />
         Sent: {formatUkDateTime(order.submittedAt)}<br />
-        Email: {emailStatusLabel(order.emailStatus)}
+        Supplier email: {supplierEmail}<br />
+        Shop PDF copy: {shopCopy}
       </p>
       <p><StatusBadge status={order.status} /></p>
       <div className="summaryGrid">
@@ -53,9 +58,14 @@ export default async function OfficeOrderDetail({
       </div>
       <div className="actions" style={{ marginTop: 16 }}>
         <a className="button secondary" href={`/api/export/order/${order.id}`}>Export Excel</a>
-        {order.status === "submitted" && (
-          <form action={resendOrderEmail.bind(null, order.id)}>
-            <SubmitButton idle="Resend email" pending="Sending..." className="button secondary" />
+        {order.status === "submitted" && canResendSupplier(order.emailStatus, logs) && (
+          <form action={resendSupplierEmail.bind(null, order.id)}>
+            <SubmitButton idle="Resend supplier email" pending="Sending..." className="button secondary" />
+          </form>
+        )}
+        {order.status === "submitted" && canResendShopCopy(order.emailStatus, order.storeEmail, logs) && (
+          <form action={resendShopCopy.bind(null, order.id)}>
+            <SubmitButton idle="Resend shop copy" pending="Sending..." className="button secondary" />
           </form>
         )}
         <Link className="button secondary" href="/office">Back</Link>

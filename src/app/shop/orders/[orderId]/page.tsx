@@ -29,8 +29,10 @@ export default async function ShopOrderDetail({
       {emailFailed && <div className="banner error" role="alert">Order saved, but the email could not be sent.</div>}
       {justSent && !emailFailed && (
         <p>{query.copy === "missing"
-          ? "The supplier has received the order. A shop email is not configured, so no copy was sent."
-          : "The supplier has received the order and a copy has been sent to the shop email."}</p>
+          ? "The supplier has received the order. Shop email is not configured, so no copy was sent."
+          : query.copy === "failed"
+            ? "The supplier has received the order. The shop PDF copy could not be sent."
+            : "The supplier has received the order and a PDF copy has been sent to the shop email."}</p>
       )}
       <p className="muted">
         Supplier: {order.supplierName}<br />

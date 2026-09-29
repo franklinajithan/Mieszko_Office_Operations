@@ -63,7 +63,7 @@ describe("supplier order", () => {
   });
 
   it("builds the supplier email subject from the shop and delivery date", () => {
-    expect(orderSubject("Hounslow", "Polish Bakery", "01/10/2026")).toBe("Mieszko Hounslow - Polish Bakery Order - Delivery 01/10/2026");
+    expect(orderSubject("Hounslow", "Polish Bakery", "01/10/2026")).toBe("Mieszko Order - Hounslow - Polish Bakery - Delivery 01/10/2026");
     expect(formatUkDate("2026-10-01")).toBe("01/10/2026");
   });
 });

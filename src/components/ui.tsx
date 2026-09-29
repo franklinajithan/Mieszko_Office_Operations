@@ -9,6 +9,13 @@ const NOTICES: Record<string, string> = {
   revoked: "Sessions for that user were signed out.",
   sent: "The supplier email was sent.",
   cancelled: "The order was cancelled.",
+  "supplier-sent": "The supplier email was sent.",
+  "supplier-failed": "The supplier email could not be sent.",
+  "supplier-already": "The supplier email was already sent.",
+  "shop-sent": "The shop PDF copy was sent.",
+  "shop-failed": "The shop PDF copy could not be sent.",
+  "shop-missing": "Shop email is not configured, so the shop copy was not sent.",
+  "shop-already": "The shop PDF copy was already sent.",
 };
 
 const ERRORS: Record<string, string> = {
@@ -32,6 +39,7 @@ const ERRORS: Record<string, string> = {
   "email-off": "Supplier email is turned off. An administrator can enable it under Suppliers.",
   "email-setup": "Email sending is not set up yet.",
   "email-failed": "The supplier email could not be sent. Please try again.",
+  "supplier-first": "Send the supplier email before resending the shop copy.",
   date: "Please select a delivery date.",
   empty: "Please enter at least one product quantity.",
   supplier: "Please select a supplier.",

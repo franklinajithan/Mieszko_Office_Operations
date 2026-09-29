@@ -22,6 +22,7 @@ export type OrderLine = {
   id: string | null;
   productId: string;
   name: string;
+  polishName: string | null;
   itemCode: string | null;
   ean: string | null;
   supplierCode: string | null;
@@ -261,20 +262,21 @@ export async function getProduct(id: string) {
   return mapProduct(chosen.data as Record<string, unknown>);
 }
 
-const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email), suppliers(name, order_email, cc_emails), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, item_code, barcode, ean, supplier_code, supplier_product_code))";
-const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, item_code, barcode, supplier_product_code))";
+const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email), suppliers(name, order_email, cc_emails), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code))";
+const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, polish_name, item_code, barcode, supplier_product_code))";
 
 function mapOrder(row: Record<string, unknown>): OrderDetail | null {
   const store = one(row.stores as Embedded<{ name?: string; code?: string | null; email?: string | null }>);
   const supplier = one(row.suppliers as Embedded<{ name?: string; order_email?: string | null; cc_emails?: unknown }>);
   const items = (Array.isArray(row.order_items) ? row.order_items : []) as Record<string, unknown>[];
   const lines = items.map((item) => {
-    const product = one(item.products as Embedded<{ name?: string; item_code?: string | null; barcode?: string | null; ean?: string | null; supplier_code?: string | null; supplier_product_code?: string | null }>);
+    const product = one(item.products as Embedded<{ name?: string; polish_name?: string | null; item_code?: string | null; barcode?: string | null; ean?: string | null; supplier_code?: string | null; supplier_product_code?: string | null }>);
     const quantity = numberValue(item.quantity ?? item.cases);
     return {
       id: text(item.id),
       productId: String(item.product_id ?? ""),
       name: text(item.product_name_snapshot) || product?.name || "Product",
+      polishName: text(product?.polish_name),
       itemCode: text(item.item_code_snapshot) || text(product?.item_code),
       ean: text(item.ean_snapshot) || text(product?.ean) || text(product?.barcode),
       supplierCode: text(item.supplier_code_snapshot) || text(product?.supplier_code) || text(product?.supplier_product_code),
@@ -376,6 +378,33 @@ export async function getOrder(id: string) {
     return null;
   }
   return mapOrder(chosen.data as Record<string, unknown>);
+}
+
+export type OrderEmailLogRow = {
+  kind: string | null;
+  status: string | null;
+  error: string | null;
+  recipient: string | null;
+  createdAt: string | null;
+};
+
+export async function listOrderEmailLogs(orderId: string) {
+  const { data, error } = await db()
+    .from("order_email_log")
+    .select("kind, status, error_message, recipient, created_at")
+    .eq("order_id", orderId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    if (!isMissingRelation(error)) logServerError("email log", error.message);
+    return [] as OrderEmailLogRow[];
+  }
+  return (data ?? []).map((row) => ({
+    kind: text(row.kind),
+    status: text(row.status),
+    error: text(row.error_message),
+    recipient: text(row.recipient),
+    createdAt: text(row.created_at),
+  }));
 }
 
 export async function getOrCreateDraft(input: { storeId: string; supplierId: string; userId: string; deliveryDate: string }) {

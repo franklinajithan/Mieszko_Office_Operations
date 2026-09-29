@@ -130,7 +130,8 @@ export async function submitOrder(orderId: string) {
   const email = await deliverOrderEmail(fresh, staff);
   revalidatePath("/shop");
   revalidatePath("/office");
-  if (email.status === "failed") redirect(`/shop/orders/${orderId}?email=failed`);
-  if (!email.shopCopied) redirect(`/shop/orders/${orderId}?sent=1&copy=missing`);
+  if (email.supplierStatus === "failed") redirect(`/shop/orders/${orderId}?email=failed`);
+  if (email.shopStatus === "missing") redirect(`/shop/orders/${orderId}?sent=1&copy=missing`);
+  if (email.shopStatus === "failed") redirect(`/shop/orders/${orderId}?sent=1&copy=failed`);
   redirect(`/shop/orders/${orderId}?sent=1`);
 }
