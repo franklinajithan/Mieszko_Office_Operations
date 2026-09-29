@@ -577,3 +577,22 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   padding: 0 24px; font-size: 20px; font-weight: 800;
   border-radius: 14px;
 }
+
+
+/* Login form final */
+.authCard.loginForm { display:flex; flex-direction:column; width:min(430px,100%); gap:0; }
+.authCard.loginForm .loginLogo {
+  display:block; width:190px; max-width:62%; height:auto;
+  object-fit:contain; margin:0 auto 18px;
+}
+.authCard.loginForm .loginSubmit {
+  display:flex !important; width:100% !important; max-width:none !important;
+  min-height:66px !important; margin:30px 0 0 !important;
+  padding:0 24px !important; align-items:center; justify-content:center;
+  font-size:20px !important; font-weight:800; border-radius:14px;
+}
+@media (max-width:720px) {
+  .authCard.loginForm { padding:28px 22px; }
+  .authCard.loginForm .loginLogo { width:180px; margin-bottom:16px; }
+  .authCard.loginForm .loginSubmit { min-height:68px !important; margin-top:30px !important; }
+}
