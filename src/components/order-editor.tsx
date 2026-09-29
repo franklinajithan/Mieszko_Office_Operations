@@ -44,7 +44,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
   const totals = summarize(products.map((product) => ({ quantity: quantities[product.id] || 0 })));
 
   return (
-    <>
+    <div className="orderEditor">
       <div className="toolbar">
         <label className="searchLabel">
           <span className="srOnly">Search products</span>
@@ -108,6 +108,6 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
         </div>
         <button type="button" className="button primary" onClick={async () => { await pending.current; router.push(`/shop/order/${orderId}/review`); }}>Review order</button>
       </div>
-    </>
+    </div>
   );
 }
