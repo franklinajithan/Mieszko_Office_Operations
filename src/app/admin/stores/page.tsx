@@ -1,3 +1,4 @@
+import { ShopsGrid } from "@/components/data-grids";
 import Link from "next/link";
 import { Banner, PageIntro } from "@/components/ui";
 import { saveStore, setStoreActive } from "@/server/actions/admin";
@@ -22,24 +23,7 @@ export default async function StoresPage({ searchParams }: { searchParams: Promi
           {editing && <Link className="button secondary" href="/admin/stores">Cancel</Link>}
         </div>
       </form>
-      <div className="adminGrid">
-        {stores.map((store) => (
-          <div className="adminRow" key={store.id}>
-            <div>
-              <b>{store.name}</b>
-              <p className="muted">{store.code || "No store code"} · {store.email || "No shop email"} · {store.active ? "Active" : "Inactive"}</p>
-            </div>
-            <div className="actions">
-              <Link className="button secondary" href={`/admin/stores?edit=${store.id}`}>Edit</Link>
-              <form action={setStoreActive}>
-                <input type="hidden" name="id" value={store.id} />
-                <input type="hidden" name="active" value={store.active ? "false" : "true"} />
-                <button className="button secondary" type="submit">{store.active ? "Deactivate" : "Activate"}</button>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
+      <ShopsGrid stores={stores} />
     </>
   );
 }
