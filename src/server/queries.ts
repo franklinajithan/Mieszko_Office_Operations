@@ -683,6 +683,108 @@ export async function getOrderStats(params: {
   };
 }
 
+export type ProductOrderSummary = {
+  productId: string;
+  productName: string;
+  itemCode: string | null;
+  ean: string | null;
+  supplierName: string;
+  caseSize: number;
+  totalOrders: number;
+  totalQuantity: number;
+  lastOrderDate: string | null;
+};
+
+export async function getProductOrderSummary(params: {
+  startDate?: string;
+  endDate?: string;
+  supplierId?: string;
+}): Promise<ProductOrderSummary[]> {
+  let query = db()
+    .from("products")
+    .select(`
+      id,
+      name,
+      item_code,
+      barcode,
+      case_size,
+      supplier_id,
+      suppliers!inner(name),
+      order_items!left(
+        quantity,
+        orders!inner(order_date, status)
+      )
+    `)
+    .eq("active", true);
+
+  if (params.supplierId) {
+    query = query.eq("supplier_id", params.supplierId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logServerError("product order summary", error.message);
+    return [];
+  }
+
+  const results: ProductOrderSummary[] = [];
+
+  for (const product of data ?? []) {
+    const supplierData = Array.isArray(product.suppliers)
+      ? product.suppliers[0]
+      : product.suppliers;
+    const orderItems = Array.isArray(product.order_items)
+      ? product.order_items
+      : [];
+
+    let totalQuantity = 0;
+    let orderCount = 0;
+    let lastOrderDate: string | null = null;
+    const orderDates: string[] = [];
+
+    for (const item of orderItems) {
+      const orderData = Array.isArray(item.orders) ? item.orders[0] : item.orders;
+      if (!orderData || orderData.status === "cancelled") continue;
+
+      const orderDate = String(orderData.order_date);
+      
+      if (params.startDate && orderDate < params.startDate) continue;
+      if (params.endDate && orderDate > params.endDate) continue;
+
+      totalQuantity += Number(item.quantity) || 0;
+      orderCount++;
+      orderDates.push(orderDate);
+    }
+
+    if (orderDates.length > 0) {
+      orderDates.sort();
+      lastOrderDate = orderDates[orderDates.length - 1];
+    }
+
+    if (orderCount > 0 || !params.startDate) {
+      results.push({
+        productId: String(product.id),
+        productName: String(product.name),
+        itemCode: text(product.item_code),
+        ean: text(product.barcode),
+        supplierName: supplierData ? String(supplierData.name) : "",
+        caseSize: Number(product.case_size) || 1,
+        totalOrders: orderCount,
+        totalQuantity,
+        lastOrderDate,
+      });
+    }
+  }
+
+  return results.sort((a, b) => {
+    if (a.totalQuantity !== b.totalQuantity) {
+      return b.totalQuantity - a.totalQuantity;
+    }
+    return a.productName.localeCompare(b.productName);
+  });
+}
+
 export async function listMissingOrders(targetDate: string): Promise<MissingOrderRow[]> {
   const [assignments, stores, suppliers, orders] = await Promise.all([
     listAssignments(),
