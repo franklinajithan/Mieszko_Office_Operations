@@ -932,3 +932,5 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
  .mieszkoGrid .ag-root-wrapper{min-width:720px}
  .orderAgGrid .ag-root-wrapper{min-width:760px}
 }
+
+/* AG Grid migration complete */
