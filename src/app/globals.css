@@ -498,3 +498,52 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .shopShell .history .data td::before { flex: 0 0 40%; }
   .shopShell .history .data td:last-child { padding-bottom: 9px; }
 }
+
+
+/* Login screen: clean app entry */
+.authPage {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  background: #f4f6f8;
+}
+.authCard {
+  width: min(390px, 100%);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(17,26,22,.08);
+}
+.authCard .mark { width: 48px; height: 48px; border-radius: 14px; }
+.authCard h1 { margin: 18px 0 6px; font-size: 30px; line-height: 1.08; }
+.authCard p { margin: 0 0 20px; font-size: 16px; }
+.authCard .field { display: block; }
+.authCard .pinInput {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid #dce2de;
+  border-radius: 13px;
+  background: #fafbfb;
+  letter-spacing: .35em;
+  text-align: center;
+  font-size: 24px;
+  outline: none;
+  box-shadow: none;
+}
+.authCard .pinInput:focus {
+  border-color: #b91f26;
+  box-shadow: 0 0 0 3px rgba(185,31,38,.10);
+}
+.authCard .pinInput:focus-visible { outline: none; }
+.authCard button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 12px;
+  border-radius: 13px;
+}
+@media (max-width: 720px) {
+  .authPage { align-items: center; padding-left: 18px; padding-right: 18px; }
+  .authCard { padding: 26px 22px; }
+  .authCard h1 { font-size: 28px; }
+}
