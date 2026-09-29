@@ -256,3 +256,43 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
   .content { padding: 0; }
   body { background: white; }
 }
+
+
+@media (max-width: 720px) {
+  .orderSheet { background: transparent; border: 0; overflow: visible; }
+  .orderSheet .orderTable { display: grid; gap: 12px; }
+  .orderSheet .orderTable tbody { display: grid; gap: 12px; }
+  .orderSheet .orderTable tr {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;
+    padding: 16px; background: white; border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(28,36,32,.04);
+  }
+  .orderSheet .orderTable td { display: block; padding: 0; min-width: 0; }
+  .orderSheet .orderTable td::before {
+    display: block; margin-bottom: 2px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted); font-weight: 750;
+  }
+  .orderSheet .orderTable td:nth-child(1),
+  .orderSheet .orderTable td:nth-child(2) { font-size: 13px; color: var(--muted); }
+  .orderSheet .orderTable td:nth-child(3) {
+    grid-column: 1 / 2; grid-row: 1; font-size: 14px; font-weight: 800;
+  }
+  .orderSheet .orderTable td:nth-child(4) {
+    grid-column: 1 / -1; grid-row: 2; padding: 8px 0 4px; border-top: 1px solid var(--line);
+  }
+  .orderSheet .orderTable td:nth-child(5) {
+    grid-column: 1 / -1; grid-row: 3;
+  }
+  .orderSheet .orderTable td:nth-child(1) { grid-column: 1; grid-row: 4; }
+  .orderSheet .orderTable td:nth-child(2) { grid-column: 2; grid-row: 4; }
+  .orderSheet .orderTable td:nth-child(3)::before { content: "Code"; }
+  .orderSheet td.productName { font-size: 17px; line-height: 1.3; }
+  .orderSheet td.productName .muted { display: inline-block; margin-top: 4px; font-size: 14px; }
+  .orderSheet .qtyInput { width: 100%; min-height: 52px; font-size: 22px; }
+  .toolbar { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .toolbar .searchLabel { min-width: 0; }
+  .toolbar .segmented { display: grid; grid-template-columns: 1fr 1fr 1.2fr; width: 100%; }
+  .toolbar .segmented button { padding: 8px 6px; min-height: 44px; font-size: 13px; line-height: 1.2; }
+  .orderBar { padding: 12px; }
+  .orderBar .button { min-height: 52px; }
+}
