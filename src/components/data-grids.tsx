@@ -63,10 +63,15 @@ export function ShopsGrid({ stores }: { stores: any[] }) {
   ]} height={Math.min(520, 80 + Math.max(rows.length,5)*42)} />;
 }
 
+function SupplierMobileActions({ data }: { data?: Row }) {
+  if (!data?.editHref) return null;
+  return <Link className="gridEditLink" href={String(data.editHref)}>Edit</Link>;
+}
+
 export function SuppliersGrid({ suppliers }: { suppliers: any[] }) {
   const rows = suppliers.map(s => ({ name:s.name, email:s.orderEmail || "—", cc:(s.ccEmails || []).join(", ") || "—", status:s.active ? "Active":"Inactive", id:s.id, active:s.active, actionType:"supplier", editHref:`/admin/suppliers?edit=${s.id}` }));
   return <MieszkoDataGrid rows={rows} columns={[
-    {field:"name",headerName:"Supplier",minWidth:180,flex:1.5},{field:"email",headerName:"Order email",minWidth:220,flex:2},{field:"cc",headerName:"CC emails",minWidth:180,flex:1.5},{field:"status",headerName:"Status",width:100,flex:0},{field:"editHref"}
+    {field:"name",headerName:"Supplier",minWidth:160,flex:1.5},{field:"email",headerName:"Order email",minWidth:190,flex:2},{field:"cc",headerName:"CC emails",minWidth:180,flex:1.5},{field:"status",headerName:"Status",width:100,flex:0},{field:"editHref",headerName:"Edit",width:78,minWidth:78,maxWidth:78,pinned:"right",sortable:false,filter:false,resizable:false,cellRenderer:SupplierMobileActions}
   ]} height={Math.min(520, 80 + Math.max(rows.length,5)*42)} />;
 }
 
