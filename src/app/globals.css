@@ -979,3 +979,13 @@ html,body{width:100%;min-height:100%;margin:0}
 @media(max-width:720px){
  .orderAgGrid .ag-root-wrapper{min-width:720px}
 }
+
+
+/* Mobile ordering grid: prioritise Supplier Code, Product and editable Qty */
+@media(max-width:720px){
+ .orderAgGrid{width:100%!important;overflow:hidden!important}
+ .orderAgGrid .ag-root-wrapper{min-width:0!important;width:100%!important}
+ .orderAgGrid .ag-center-cols-viewport,.orderAgGrid .ag-center-cols-container{min-width:0!important}
+ .orderAgGrid .ag-pinned-right-cols-container,.orderAgGrid .ag-pinned-right-header{display:block!important}
+ .orderAgGrid .agQtyCell{font-size:15px!important}
+}
