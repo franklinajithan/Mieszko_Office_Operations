@@ -565,3 +565,15 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
     border-radius: 14px;
   }
 }
+
+
+/* Explicit login form layout — avoids generic form-grid overrides */
+.authCard .loginForm { display: flex; flex-direction: column; width: 100%; gap: 0; }
+.authCard .loginForm .field { width: 100%; margin: 0; }
+.authCard .loginForm .loginSubmit {
+  display: flex; width: 100% !important; max-width: none !important;
+  min-height: 64px !important; margin: 28px 0 0 !important;
+  align-items: center; justify-content: center;
+  padding: 0 24px; font-size: 20px; font-weight: 800;
+  border-radius: 14px;
+}
