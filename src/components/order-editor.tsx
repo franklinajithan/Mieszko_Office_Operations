@@ -8,6 +8,7 @@ import { saveOrderLine } from "@/server/actions/shop";
 export type EditorProduct = {
   id: string;
   name: string;
+  polishName: string | null;
   itemCode: string | null;
   ean: string | null;
   supplierCode: string | null;
@@ -19,6 +20,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
   const [quantities, setQuantities] = useState<Record<string, number>>(() => Object.fromEntries(products.map((product) => [product.id, product.quantity])));
   const [search, setSearch] = useState("");
   const [orderedOnly, setOrderedOnly] = useState(false);
+  const [showPolish, setShowPolish] = useState(true);
   const [error, setError] = useState("");
   const pending = useRef<Promise<void>>(Promise.resolve());
 
@@ -51,6 +53,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
         <div className="segmented" role="group" aria-label="Product filter">
           <button type="button" className={!orderedOnly ? "on" : undefined} onClick={() => setOrderedOnly(false)}>All products</button>
           <button type="button" className={orderedOnly ? "on" : undefined} onClick={() => setOrderedOnly(true)}>Ordered only</button>
+          <button type="button" className={showPolish ? "on" : undefined} onClick={() => setShowPolish((value) => !value)}>{showPolish ? "Polish names: On" : "Polish names: Off"}</button>
         </div>
       </div>
       {error && <div className="banner error" role="alert">{error}</div>}
@@ -78,7 +81,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
                     <td data-label="Item code">{product.itemCode || "—"}</td>
                     <td data-label="EAN">{product.ean || "—"}</td>
                     <td data-label="Supplier code">{product.supplierCode || "—"}</td>
-                    <td data-label="Product name" className="productName">{product.name}</td>
+                    <td data-label="Product name" className="productName"><b>{product.name}</b>{showPolish && product.polishName && <><br /><span className="muted">{product.polishName}</span></>}</td>
                     <td data-label="Qty">
                       <input
                         className="qtyInput"
