@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
-import { ClipboardList, LogOut, Settings } from "lucide-react";
+import { ClipboardList, LogOut, Settings, Users, PackagePlus, Store, Mail } from "lucide-react";
 import { signOut } from "@/server/actions/auth";
 import type { Staff } from "@/server/session";
 import { NavLink } from "./controls";
 
 const OFFICE_NAV = [
   { href: "/office", label: "Orders", icon: ClipboardList, exact: true, adminOnly: false, nested: false },
-  { href: "/admin", label: "Administration", icon: Settings, exact: false, adminOnly: true, nested: false },
+  { href: "/admin", label: "Administration", icon: Settings, exact: true, adminOnly: true, nested: false },
+  { href: "/admin/users", label: "Users", icon: Users, exact: false, adminOnly: true, nested: true },
+  { href: "/admin/products", label: "Products", icon: PackagePlus, exact: false, adminOnly: true, nested: true },
+  { href: "/admin/suppliers", label: "Suppliers & emails", icon: Mail, exact: false, adminOnly: true, nested: true },
+  { href: "/admin/stores", label: "Shops & emails", icon: Store, exact: false, adminOnly: true, nested: true },
 ];
 
 export function OfficeShell({ staff, children }: { staff: Staff; children: ReactNode }) {
