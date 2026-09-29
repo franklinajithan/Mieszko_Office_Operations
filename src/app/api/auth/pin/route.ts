@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 
 export async function POST(req: Request) {
   let pin: unknown;
@@ -58,10 +58,15 @@ export async function POST(req: Request) {
   if (linkError || !link?.properties?.hashed_token) {
     return NextResponse.json({ error: "Unable to sign in" }, { status: 500 });
   }
-  // Exchange on the server so SSR pages receive session cookies immediately.
-  // Never return login links or authentication tokens to the UI.
-  const client = await createClient();
+  // Exchange the OTP and attach Supabase cookies to the exact response sent to the browser.
+  const response = NextResponse.json({ actionLink: "/" }, { headers: { "Cache-Control": "no-store" } });
+  const client = createServerClient(url, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+    cookies: {
+      getAll() { return []; },
+      setAll(items) { items.forEach(({ name, value, options }) => response.cookies.set(name, value, options)); }
+    }
+  });
   const { error: sessionError } = await client.auth.verifyOtp({ token_hash: link.properties.hashed_token, type: "magiclink" });
   if (sessionError) return NextResponse.json({ error: "Unable to sign in" }, { status: 500 });
-  return NextResponse.json({ actionLink: "/" }, { headers: { "Cache-Control": "no-store" } });
+  return response;
 }
