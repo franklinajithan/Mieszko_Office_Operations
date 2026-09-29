@@ -63,37 +63,20 @@ export function StatusBadge({ status }: { status: string }) {
 export function OrderTable({ orders, hrefBase, mode, empty = "No orders match these filters." }: { orders: OrderListItem[]; hrefBase: string; mode: "shop" | "office"; empty?: string }) {
   if (!orders.length) return <EmptyState title="No orders" text={empty} />;
   return (
-    <div className="tableWrap">
-      <table className="data">
-        <thead>
-          <tr>
-            {mode === "office" && <th>Shop</th>}
-            <th>Supplier</th>
-            <th>Order date</th>
-            <th>Delivery date</th>
-            <th>Products</th>
-            <th>Qty</th>
-            <th>Email</th>
-            <th>Sent by</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id} className="clickRow">
-              {mode === "office" && <td data-label="Shop"><Link className="rowLink" href={`${hrefBase}/${order.id}`}>{order.storeName}</Link></td>}
-              <td data-label="Supplier">{mode === "shop" ? <Link className="rowLink" href={`${hrefBase}/${order.id}`}>{order.supplierName}</Link> : order.supplierName}</td>
-              <td data-label="Order date">{formatUkDate(order.orderDate)}</td>
-              <td data-label="Delivery date">{formatUkDate(order.deliveryDate)}</td>
-              <td data-label="Products">{order.products}</td>
-              <td data-label="Qty">{order.totalQty}</td>
-              <td data-label="Email">{emailStatusLabel(order.emailStatus)}</td>
-              <td data-label="Sent by">{order.sentBy || (order.status === "draft" ? "—" : "Unknown")}</td>
-              <td data-label="Status"><StatusBadge status={order.status} /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="recordGrid orderRecordGrid">
+      {orders.map((order) => (
+        <Link key={order.id} className="recordRow orderRecord" href={`${hrefBase}/${order.id}`}>
+          {mode === "office" && <span className="recordCell"><small>Shop</small><b>{order.storeName}</b></span>}
+          <span className="recordCell recordPrimary"><small>Supplier</small><b>{order.supplierName}</b></span>
+          <span className="recordCell"><small>Order date</small>{formatUkDate(order.orderDate)}</span>
+          <span className="recordCell"><small>Delivery</small>{formatUkDate(order.deliveryDate)}</span>
+          <span className="recordCell"><small>Products</small>{order.products}</span>
+          <span className="recordCell"><small>Qty</small>{order.totalQty}</span>
+          <span className="recordCell"><small>Email</small>{emailStatusLabel(order.emailStatus)}</span>
+          <span className="recordCell"><small>Sent by</small>{order.sentBy || (order.status === "draft" ? "—" : "Unknown")}</span>
+          <span className="recordCell recordStatus"><small>Status</small><StatusBadge status={order.status} /></span>
+        </Link>
+      ))}
     </div>
   );
 }
