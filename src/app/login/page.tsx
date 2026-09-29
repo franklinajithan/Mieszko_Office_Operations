@@ -8,8 +8,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const query = await searchParams;
   return (
     <main className="authPage">
-      <form className="authCard" action={signIn}>
-        <div className="mark" aria-hidden="true">M</div>
+      <form className="authCard loginForm" action={signIn}>
+        <img className="loginLogo" src="/mieszko-logo.webp" alt="Polski Supermarket Mieszko" />
         <h1>Mieszko Office Operations</h1>
         <p>Enter your 6-digit PIN</p>
         <label className="field">
@@ -30,7 +30,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           />
         </label>
         <Banner notice={query.notice} error={query.error} />
-        <SubmitButton idle="Sign In" pending="Signing in..." />
+        <SubmitButton className="button primary loginSubmit" idle="Sign In" pending="Signing in..." />
       </form>
     </main>
   );
