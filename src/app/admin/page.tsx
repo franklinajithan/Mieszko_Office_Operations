@@ -2,10 +2,11 @@ import Link from "next/link";
 import { PageIntro } from "@/components/ui";
 
 const LINKS = [
-  ["/admin/stores", "Shops", "Name, store code, email and active status."],
-  ["/admin/suppliers", "Suppliers", "Name and the order email address."],
-  ["/admin/products", "Products", "Item code, EAN, supplier code and name."],
-  ["/admin/users", "Users / PINs", "Name, role, shop and 6-digit PIN."],
+  ["/admin/users", "Create / Manage Users", "Create shop, office and admin users; assign shops and manage 6-digit PINs."],
+  ["/admin/products", "Add / Manage Products", "Add products with English/Polish names, item code, EAN and supplier code."],
+  ["/admin/suppliers", "Supplier Manager", "Add suppliers and manage supplier order/CC email addresses."],
+  ["/admin/stores", "Shop Email Manager", "Manage shop email addresses used for order copies."],
+
 ] as const;
 
 export default function AdminHome() {
