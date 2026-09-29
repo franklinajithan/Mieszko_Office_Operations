@@ -1,3 +1,4 @@
+import { OrdersGrid } from "@/components/data-grids";
 import Link from "next/link";
 import { formatUkDate, emailStatusLabel, statusLabel } from "@/lib/format";
 import type { OrderListItem } from "@/server/queries";
@@ -62,23 +63,7 @@ export function StatusBadge({ status }: { status: string }) {
 
 export function OrderTable({ orders, hrefBase, mode, empty = "No orders match these filters." }: { orders: OrderListItem[]; hrefBase: string; mode: "shop" | "office"; empty?: string }) {
   if (!orders.length) return <EmptyState title="No orders" text={empty} />;
-  return (
-    <div className="recordGrid orderRecordGrid">
-      {orders.map((order) => (
-        <Link key={order.id} className="recordRow orderRecord" href={`${hrefBase}/${order.id}`}>
-          {mode === "office" && <span className="recordCell"><small>Shop</small><b>{order.storeName}</b></span>}
-          <span className="recordCell recordPrimary"><small>Supplier</small><b>{order.supplierName}</b></span>
-          <span className="recordCell"><small>Order date</small>{formatUkDate(order.orderDate)}</span>
-          <span className="recordCell"><small>Delivery</small>{formatUkDate(order.deliveryDate)}</span>
-          <span className="recordCell"><small>Products</small>{order.products}</span>
-          <span className="recordCell"><small>Qty</small>{order.totalQty}</span>
-          <span className="recordCell"><small>Email</small>{emailStatusLabel(order.emailStatus)}</span>
-          <span className="recordCell"><small>Sent by</small>{order.sentBy || (order.status === "draft" ? "—" : "Unknown")}</span>
-          <span className="recordCell recordStatus"><small>Status</small><StatusBadge status={order.status} /></span>
-        </Link>
-      ))}
-    </div>
-  );
+  return <OrdersGrid orders={orders} hrefBase={hrefBase} mode={mode} />;
 }
 
 export function PageIntro({ eyebrow, title, text }: { eyebrow?: string; title: string; text?: string }) {
