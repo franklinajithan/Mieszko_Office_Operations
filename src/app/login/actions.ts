@@ -16,5 +16,6 @@ export async function pinLogin(formData: FormData) {
   const supabase = await createClient();
   const { error: sessionError } = await supabase.auth.verifyOtp({ token_hash: link.properties.hashed_token, type: "magiclink" });
   if (sessionError) redirect("/login?error=signin");
-  redirect("/");
+  const role = data[0].role;
+  redirect(role === "store" ? "/shop" : "/head-office");
 }
