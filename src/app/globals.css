@@ -936,3 +936,29 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
 /* AG Grid migration complete */
 
 .mieszkoGrid .gridActions{display:flex;align-items:center;gap:9px;height:100%}.mieszkoGrid .gridActions form{margin:0}.mieszkoGrid .gridActionButton{border:0;background:transparent;padding:0;font:inherit;font-size:10.5px;font-weight:700;color:#6d7671;cursor:pointer}.mieszkoGrid .gridActionButton:hover{color:#9f1d23}
+
+
+/* Full-screen application workspace — shared across Office/Admin/Shop */
+html,body{width:100%;min-height:100%;margin:0}
+.shell,.shopAppShell{width:100%;max-width:none}
+.workspace,.shopWorkspace{min-width:0;width:100%}
+.workspace .content,.shopContent{width:100%;max-width:none!important;margin:0!important;box-sizing:border-box}
+.workspace .content{padding:18px 18px 40px!important}
+.shopContent{padding:18px 18px 44px!important}
+.workspace .pageIntro,.shopContent .pageIntro{width:100%;margin-bottom:12px}
+.workspace .panel,.shopContent .panel,.workspace .filters{width:100%;box-sizing:border-box}
+.mieszkoGrid{width:100%!important;max-width:none}
+.mieszkoGrid .ag-root-wrapper{width:100%}
+@media(min-width:901px){
+ .shell{grid-template-columns:220px minmax(0,1fr)!important}
+ .shell aside{width:220px!important}
+ .shopAppShell{grid-template-columns:220px minmax(0,1fr)}
+ .shopDesktopNav{width:220px}
+ .workspace .content,.shopContent{max-width:none!important}
+}
+@media(min-width:1400px){
+ .workspace .content,.shopContent{padding-left:20px!important;padding-right:20px!important}
+}
+@media(max-width:900px){
+ .workspace .content,.shopContent{padding:14px 12px 92px!important}
+}
