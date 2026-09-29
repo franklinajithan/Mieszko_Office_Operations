@@ -320,12 +320,24 @@ function toListItem(order: OrderDetail): OrderListItem {
   };
 }
 
-async function selectOrders(filters: { storeId?: string; supplierId?: string; date?: string; deliveryDate?: string; status?: string; emailStatus?: string; limit?: number }) {
+async function selectOrders(filters: { 
+  storeId?: string; 
+  supplierId?: string; 
+  date?: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+  deliveryDate?: string; 
+  status?: string; 
+  emailStatus?: string; 
+  limit?: number 
+}) {
   const run = (columns: string, includeDelivery: boolean) => {
     let query = db().from("orders").select(columns).order("order_date", { ascending: false }).limit(filters.limit ?? 200);
     if (filters.storeId) query = query.eq("store_id", filters.storeId);
     if (filters.supplierId) query = query.eq("supplier_id", filters.supplierId);
     if (filters.date) query = query.eq("order_date", filters.date);
+    if (filters.dateFrom) query = query.gte("order_date", filters.dateFrom);
+    if (filters.dateTo) query = query.lte("order_date", filters.dateTo);
     if (includeDelivery && filters.deliveryDate) query = query.eq("delivery_date", filters.deliveryDate);
     if (filters.status) query = query.eq("status", filters.status);
     if (includeDelivery && filters.emailStatus) query = query.eq("email_status", filters.emailStatus);
@@ -342,7 +354,17 @@ async function selectOrders(filters: { storeId?: string; supplierId?: string; da
   return basic.data ?? [];
 }
 
-export async function listOrders(filters: { storeId?: string; supplierId?: string; date?: string; deliveryDate?: string; status?: string; emailStatus?: string; limit?: number }) {
+export async function listOrders(filters: { 
+  storeId?: string; 
+  supplierId?: string; 
+  date?: string; 
+  dateFrom?: string; 
+  dateTo?: string; 
+  deliveryDate?: string; 
+  status?: string; 
+  emailStatus?: string; 
+  limit?: number 
+}) {
   const data = await selectOrders(filters);
   return data
     .map((row) => mapOrder(row as unknown as Record<string, unknown>))
