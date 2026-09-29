@@ -32,6 +32,7 @@ export default async function ShopOrderPage({ params }: { params: Promise<{ supp
         products={products.map((product) => ({
           id: product.id,
           name: product.name,
+          polishName: product.polishName,
           itemCode: product.itemCode,
           ean: product.ean,
           supplierCode: product.supplierCode,
