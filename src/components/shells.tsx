@@ -79,7 +79,7 @@ export function ShopShell({
       <div className="content">{children}</div>
       <nav className="bottomNav" aria-label="Shop">
         <NavLink href="/shop/new" exact={false}>New order</NavLink>
-        <NavLink href="/shop/history" exact={false}>Order history</NavLink>
+        <a href="/shop/history">Order history</a>
       </nav>
     </div>
   );
