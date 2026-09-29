@@ -1,5 +1,5 @@
 import "server-only";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { dispatchOrderEmails, type DispatchTarget, type OutboundEmail } from "@/lib/order-dispatch";
 import { orderPdfFilename } from "@/lib/order-message";
 import { writeAudit } from "./audit";
@@ -15,23 +15,23 @@ export type EmailResult = {
   error?: string;
 };
 
-async function sendWithResend(message: OutboundEmail) {
-  const from = process.env.ORDER_FROM_EMAIL?.trim();
-  if (!from || !process.env.RESEND_API_KEY) return { error: "Email is not configured." };
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const sent = await resend.emails.send({
-    from,
-    to: [message.to],
-    cc: message.cc.length ? message.cc : undefined,
-    subject: message.subject,
-    html: message.html,
-    attachments: message.attachments.map((file) => ({
-      filename: file.filename,
-      content: Buffer.from(file.content),
-    })),
-  });
-  if (sent.error) logServerError("order email", sent.error.message);
-  return { id: sent.data?.id ?? null, error: sent.error?.message ?? null };
+async function sendWithGmail(message: OutboundEmail) {
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_APP_PASSWORD?.replace(/\\s+/g, "");
+  if (!user || !pass) return { error: "Email is not configured." };
+  try {
+    const transporter = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
+    const sent = await transporter.sendMail({
+      from: `Mieszko Operations <${user}>`, to: message.to,
+      cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
+      attachments: message.attachments.map(file => ({ filename: file.filename, content: Buffer.from(file.content) })),
+    });
+    return { id: sent.messageId ?? null, error: null };
+  } catch (error) {
+    const messageText = error instanceof Error ? error.message : "Gmail send failed.";
+    logServerError("order email", messageText);
+    return { id: null, error: messageText };
+  }
 }
 
 async function insertEmailLog(input: {
@@ -68,13 +68,13 @@ export async function deliverOrderEmail(
   options?: { target?: DispatchTarget; auditAction?: string },
 ): Promise<EmailResult> {
   const target = options?.target ?? "both";
-  const from = process.env.ORDER_FROM_EMAIL?.trim() || null;
-  const configured = Boolean(from && process.env.RESEND_API_KEY);
+  const from = process.env.SMTP_USER?.trim() || null;
+  const configured = Boolean(from && process.env.SMTP_APP_PASSWORD);
   const result = await dispatchOrderEmails({
     order,
     from: configured ? from : null,
     target,
-    send: sendWithResend,
+    send: sendWithGmail,
     renderPdf: async (current) => ({
       filename: orderPdfFilename(current),
       content: await renderOrderPdf(current),
