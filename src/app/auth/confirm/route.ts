@@ -1,0 +1,2 @@
+import { createClient } from "@/lib/supabase/server";import { NextResponse } from "next/server";
+export async function GET(req:Request){const url=new URL(req.url);const token_hash=url.searchParams.get("token_hash");const type=url.searchParams.get("type") as "magiclink"|null;if(token_hash&&type){const s=await createClient();const {error}=await s.auth.verifyOtp({token_hash,type});if(!error)return NextResponse.redirect(new URL("/",url.origin));}return NextResponse.redirect(new URL("/login?error=signin",url.origin));}
