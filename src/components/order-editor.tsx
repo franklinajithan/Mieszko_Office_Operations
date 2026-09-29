@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent, type ICellRendererParams } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -16,7 +16,12 @@ export type EditorProduct = {
   ean: string | null; supplierCode: string | null; quantity: number;
 };
 
-type GridProduct = EditorProduct & { qty: number; displayName: string };
+type GridProduct = EditorProduct & { qty: number; showPolish: boolean };
+
+function ProductNameCell({ data }: ICellRendererParams<GridProduct>) {
+  if (!data) return null;
+  return <div className="orderProductCell"><b>{data.name}</b>{data.showPolish && data.polishName ? <span>{data.polishName}</span> : null}</div>;
+}
 
 export function OrderEditor({ orderId, products }: { orderId: string; products: EditorProduct[] }) {
   const router = useRouter();
@@ -46,15 +51,15 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
     .map(product => ({
       ...product,
       qty: quantities[product.id] || 0,
-      displayName: showPolish && product.polishName ? `${product.name} · ${product.polishName}` : product.name
+      showPolish
     })), [orderedOnly, products, quantities, search, showPolish]);
 
   const columns = useMemo<ColDef<GridProduct>[]>(() => [
     { field:"itemCode", headerName:"Item code", minWidth:110 },
     { field:"ean", headerName:"EAN", minWidth:150 },
     { field:"supplierCode", headerName:"Supplier code", minWidth:125 },
-    { field:"displayName", headerName:"Product name", minWidth:300, flex:2 },
-    { field:"qty", headerName:"Qty", width:100, flex:0, editable:true, cellClass:"agQtyCell",
+    { field:"name", headerName:"Product name", minWidth:340, flex:2.4, cellRenderer: ProductNameCell },
+    { field:"qty", headerName:"Qty", width:110, minWidth:110, maxWidth:110, flex:0, pinned:"right", editable:true, cellClass:"agQtyCell",
       valueParser: p => { const n=Number(p.newValue); return Number.isInteger(n) && n > 0 ? n : 0; } }
   ], []);
 
@@ -82,8 +87,8 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
        <div className="ag-theme-quartz mieszkoGrid orderAgGrid" style={{height:Math.min(650, Math.max(300, 80 + rows.length * 42))}}>
          <AgGridReact<GridProduct> rowData={rows} columnDefs={columns}
            defaultColDef={{sortable:true,filter:true,resizable:true,flex:1,minWidth:100}}
-           rowHeight={42} headerHeight={38} animateRows={false} onCellValueChanged={changed}
-           stopEditingWhenCellsLoseFocus />
+           rowHeight={50} headerHeight={40} animateRows={false} onCellValueChanged={changed}
+           ensureDomOrder stopEditingWhenCellsLoseFocus />
        </div>}
       <div className="orderBar">
         <div><b>{totals.products} products selected</b><span>Total qty: {totals.quantity}</span></div>
