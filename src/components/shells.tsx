@@ -100,16 +100,4 @@ export function ShopShell({
   );
 }
 
-export function AdminNav() {
-  const links = [
-    ["/admin/stores", "Shops"],
-    ["/admin/suppliers", "Suppliers"],
-    ["/admin/products", "Products"],
-    ["/admin/users", "Users / PINs"],
-  ] as const;
-  return (
-    <nav className="subnav" aria-label="Administration">
-      {links.map(([href, label]) => <NavLink key={href} href={href}>{label}</NavLink>)}
-    </nav>
-  );
-}
+export function AdminNav() { return null; }
