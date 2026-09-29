@@ -26,6 +26,9 @@ export default async function OfficeHome({ searchParams }: { searchParams: Promi
         <Link className="button secondary" href="/office/consolidate">
           Consolidate orders
         </Link>
+        <Link className="button secondary" href="/office/reports">
+          View reports
+        </Link>
       </div>
       <form className="filters" method="get">
         <label className="field">Shop

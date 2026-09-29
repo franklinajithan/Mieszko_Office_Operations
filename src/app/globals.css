@@ -188,6 +188,10 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
 .adminRow { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .cards a { display: block; padding: 18px; text-decoration: none; }
+.statsGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+.statCard { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+.statLabel { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px; }
+.statValue { font-size: 32px; font-weight: 800; margin: 0; }
 
 .authPage { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
 .authCard { width: min(440px, 100%); padding: 36px; }
@@ -202,13 +206,13 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
   aside nav { grid-template-columns: 1fr 1fr; }
   .navBottom { margin-top: 12px; }
   .mobileOnly { display: none; }
-  .stats, .cards, .supplierGrid, .split, .summaryGrid { grid-template-columns: 1fr 1fr; }
+  .stats, .cards, .supplierGrid, .split, .summaryGrid, .statsGrid { grid-template-columns: 1fr 1fr; }
   .content, .topbar { padding-left: 16px; padding-right: 16px; }
 }
 @media (max-width: 720px) {
   aside { display: none; }
   .mobileOnly { display: block; }
-  .stats, .cards, .supplierGrid, .formGrid, .split, .summaryGrid { grid-template-columns: 1fr; }
+  .stats, .cards, .supplierGrid, .formGrid, .split, .summaryGrid, .statsGrid { grid-template-columns: 1fr; }
   .productRow { grid-template-columns: 1fr; }
   .data thead { display: none; }
   .data tr { display: block; padding: 8px 0; }

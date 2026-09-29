@@ -601,6 +601,88 @@ export async function getConsolidationData(params: {
   return lines;
 }
 
+export type OrderStats = {
+  totalOrders: number;
+  draftOrders: number;
+  submittedOrders: number;
+  cancelledOrders: number;
+  totalProducts: number;
+  totalQuantity: number;
+  storeCount: number;
+  supplierCount: number;
+};
+
+export async function getOrderStats(params: {
+  startDate?: string;
+  endDate?: string;
+  storeId?: string;
+  supplierId?: string;
+}): Promise<OrderStats> {
+  let ordersQuery = db()
+    .from("orders")
+    .select("id, status, store_id, supplier_id", { count: "exact" });
+
+  let itemsQuery = db()
+    .from("orders")
+    .select(`
+      order_items!inner(quantity, product_id)
+    `);
+
+  if (params.startDate) {
+    ordersQuery = ordersQuery.gte("order_date", params.startDate);
+    itemsQuery = itemsQuery.gte("order_date", params.startDate);
+  }
+  if (params.endDate) {
+    ordersQuery = ordersQuery.lte("order_date", params.endDate);
+    itemsQuery = itemsQuery.lte("order_date", params.endDate);
+  }
+  if (params.storeId) {
+    ordersQuery = ordersQuery.eq("store_id", params.storeId);
+    itemsQuery = itemsQuery.eq("store_id", params.storeId);
+  }
+  if (params.supplierId) {
+    ordersQuery = ordersQuery.eq("supplier_id", params.supplierId);
+    itemsQuery = itemsQuery.eq("supplier_id", params.supplierId);
+  }
+
+  const [ordersResult, itemsResult] = await Promise.all([
+    ordersQuery,
+    itemsQuery,
+  ]);
+
+  const orders = ordersResult.data ?? [];
+  const draftOrders = orders.filter((o) => o.status === "draft").length;
+  const submittedOrders = orders.filter((o) => o.status === "submitted").length;
+  const cancelledOrders = orders.filter((o) => o.status === "cancelled").length;
+  const storeIds = new Set(orders.map((o) => o.store_id));
+  const supplierIds = new Set(orders.map((o) => o.supplier_id));
+
+  let totalProducts = 0;
+  let totalQuantity = 0;
+  const productIds = new Set<string>();
+
+  for (const order of itemsResult.data ?? []) {
+    if (!Array.isArray(order.order_items)) continue;
+    for (const item of order.order_items) {
+      if (item.product_id) productIds.add(String(item.product_id));
+      totalQuantity += Number(item.quantity) || 0;
+    }
+  }
+
+  totalProducts = productIds.size;
+
+  return {
+    totalOrders: orders.length,
+    draftOrders,
+    submittedOrders,
+    cancelledOrders,
+    totalProducts,
+    totalQuantity,
+    storeCount: storeIds.size,
+    supplierCount: supplierIds.size,
+  };
+}
+
 export async function listMissingOrders(targetDate: string): Promise<MissingOrderRow[]> {
   const [assignments, stores, suppliers, orders] = await Promise.all([
     listAssignments(),
