@@ -788,3 +788,46 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
  .orderEditor .segmented button{padding:8px 5px;min-height:42px;font-size:12px}
  .orderEditor .orderBar{bottom:76px}
 }
+
+
+/* Admin UI reset: compact, calm, consistent */
+.workspace .content{max-width:1320px;padding:26px 32px 48px}
+.workspace .pageIntro{align-items:center;margin:0 0 16px}
+.workspace .pageIntro h1{font-size:24px;font-weight:750}
+.workspace .pageIntro p{font-size:13px;color:var(--muted)}
+.workspace .subnav{display:inline-flex;width:auto;margin:0 0 18px;padding:4px;background:#e9eeeb;border:0;border-radius:11px;gap:2px}
+.workspace .subnav a{padding:7px 11px;border:0;border-radius:8px;background:transparent;font-size:13px;font-weight:650}
+.workspace .subnav a.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(17,26,22,.08)}
+.workspace .panel{padding:16px;border-radius:14px;box-shadow:none}
+.workspace .formGrid{gap:12px}
+.workspace .formGrid input,.workspace .formGrid select,.workspace .formGrid textarea{min-height:42px;padding:9px 11px;font-size:14px;border-radius:9px}
+.workspace label.field{font-size:12px}
+.workspace .check{min-height:42px;font-size:13px}
+.workspace .check input{width:18px;height:18px;min-height:auto;accent-color:var(--red)}
+.workspace .button{min-height:40px;padding:8px 13px;border-radius:9px;font-size:13px}
+.workspace .adminGrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:14px}
+.workspace .adminGrid .adminRow{min-height:126px;padding:15px;border-radius:13px;box-shadow:none}
+.workspace .adminGrid .adminRow b{font-size:14px}
+.workspace .adminGrid .adminRow p{font-size:12px;margin-top:5px}
+.workspace .adminGrid .adminRow .actions{margin-top:12px;padding-top:11px}
+.workspace .adminGrid .adminRow .actions .button{min-height:36px;padding:6px 10px;font-size:12px}
+.workspace .adminStoreForm{grid-template-columns:repeat(12,minmax(0,1fr));align-items:end}
+.workspace .adminStoreForm>.field{grid-column:span 4}
+.workspace .adminStoreForm>.check{grid-column:span 2}
+.workspace .adminStoreForm>.wide{grid-column:span 2;margin:0}
+.workspace .adminStoreForm>.wide .button{width:100%}
+@media(max-width:1050px){
+ .workspace .adminStoreForm>.field{grid-column:span 6}
+ .workspace .adminStoreForm>.check{grid-column:span 3}
+ .workspace .adminStoreForm>.wide{grid-column:span 3}
+}
+@media(max-width:720px){
+ .workspace .content{padding:18px 14px 96px}
+ .workspace .pageIntro{display:block}
+ .workspace .pageIntro p{margin-top:4px;text-align:left}
+ .workspace .subnav{display:flex;width:100%;overflow:auto}
+ .workspace .subnav a{white-space:nowrap}
+ .workspace .adminStoreForm{grid-template-columns:1fr}
+ .workspace .adminStoreForm>.field,.workspace .adminStoreForm>.check,.workspace .adminStoreForm>.wide{grid-column:1}
+ .workspace .adminGrid{grid-template-columns:1fr}
+}
