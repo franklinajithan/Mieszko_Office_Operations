@@ -74,6 +74,7 @@ export function OrderTable({ orders, hrefBase, mode, empty = "No orders match th
             <th>Products</th>
             <th>Qty</th>
             <th>Email</th>
+            <th>Sent by</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -87,6 +88,7 @@ export function OrderTable({ orders, hrefBase, mode, empty = "No orders match th
               <td data-label="Products">{order.products}</td>
               <td data-label="Qty">{order.totalQty}</td>
               <td data-label="Email">{emailStatusLabel(order.emailStatus)}</td>
+              <td data-label="Sent by">{order.sentBy || (order.status === "draft" ? "—" : "Unknown")}</td>
               <td data-label="Status"><StatusBadge status={order.status} /></td>
             </tr>
           ))}
