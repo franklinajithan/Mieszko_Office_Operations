@@ -63,6 +63,8 @@ aside nav a.active { background: #24352c; color: white; }
 }
 .content { padding: 22px 32px 48px; }
 .mobileOnly { display: none; }
+.mobileOfficeActions { display: none; gap: 8px; align-items: center; }
+.mobileOfficeActions .button { min-height: 44px; padding: 10px 14px; }
 
 .shopShell { min-height: 100vh; padding-bottom: 84px; }
 .shopHeader { padding: 20px 20px 0; }
@@ -208,6 +210,22 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
 @media (max-width: 720px) {
   aside { display: none; }
   .mobileOnly { display: block; }
+  .mobileOfficeActions { display: flex; }
+  .topbar { padding-top: 16px; align-items: flex-start; }
+  .topbar .eyebrow { margin-bottom: 2px; }
+  .content { padding-top: 18px; padding-bottom: 96px; }
+  .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+  .filters .field { min-width: 0; }
+  .filters .button { width: 100%; }
+  .subnav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .subnav::-webkit-scrollbar { display: none; }
+  .subnav a { flex: 0 0 auto; min-height: 44px; display: inline-flex; align-items: center; }
+  .adminRow { align-items: flex-start; flex-direction: column; }
+  .adminRow .actions { width: 100%; }
+  .adminRow .actions .button { flex: 1; }
+  .panel { padding: 16px; }
+  .cards a { min-height: 110px; }
+  .pageIntro { margin-bottom: 16px; }
   .stats, .cards, .supplierGrid, .formGrid, .split, .summaryGrid { grid-template-columns: 1fr; }
   .productRow { grid-template-columns: 1fr; }
   .data thead { display: none; }
@@ -219,6 +237,18 @@ label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
   .orderSheet td.productName { display: block; font-size: 18px; font-weight: 800; }
   .orderSheet td.productName::before { content: none; }
   .qtyInput { width: 100%; min-height: 56px; font-size: 22px; }
+  .filters input, .filters select, .formGrid input, .formGrid select, .formGrid textarea { min-height: 52px; }
+}
+@media (max-width: 430px) {
+  .filters { grid-template-columns: 1fr; }
+  .topbar { gap: 10px; }
+  .topbar strong { font-size: 16px; }
+  .mobileOfficeActions { gap: 6px; }
+  .mobileOfficeActions .button { padding: 9px 11px; font-size: 14px; }
+  .content, .topbar { padding-left: 14px; padding-right: 14px; }
+  .pageIntro h1 { font-size: 27px; }
+  .actions > form { flex: 1; }
+  .actions > form .button { width: 100%; }
 }
 @media print {
   .noPrint, aside, .bottomNav, .topbar, .shopHeader form, .orderBar, .filters, .toolbar { display: none !important; }
