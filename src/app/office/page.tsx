@@ -20,14 +20,17 @@ export default async function OfficeHome({ searchParams }: { searchParams: Promi
     <>
       <PageIntro title="Orders" text="Every shop order." />
       <div className="actions" style={{ marginBottom: 16 }}>
+        <Link className="button secondary" href="/office/deliveries">
+          Track deliveries
+        </Link>
         <Link className="button secondary" href="/office/missing">
-          View missing orders
+          Missing orders
         </Link>
         <Link className="button secondary" href="/office/consolidate">
-          Consolidate orders
+          Consolidate
         </Link>
         <Link className="button secondary" href="/office/reports">
-          View reports
+          Reports
         </Link>
       </div>
       <form className="filters" method="get">
