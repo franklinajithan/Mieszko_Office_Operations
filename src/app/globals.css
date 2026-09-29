@@ -916,3 +916,19 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
  .orderRecord .recordPrimary{grid-column:1/-1}
  .orderRecord .recordStatus{justify-self:start}
 }
+
+
+/* AG Grid — Mieszko CRM */
+.mieszkoGrid{width:100%;margin-top:12px;--ag-font-family:inherit;--ag-font-size:12px;--ag-background-color:#fff;--ag-foreground-color:#17201c;--ag-header-background-color:#f4f6f5;--ag-header-foreground-color:#59635e;--ag-border-color:#e2e6e3;--ag-row-border-color:#ecefed;--ag-odd-row-background-color:#fff;--ag-row-hover-color:#f8faf9;--ag-selected-row-background-color:#fff5f5;--ag-accent-color:#b91f26;--ag-wrapper-border-radius:8px;--ag-cell-horizontal-padding:11px}
+.mieszkoGrid .ag-root-wrapper{border:1px solid #e2e6e3;box-shadow:none}
+.mieszkoGrid .ag-header-cell-text{font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.035em}
+.mieszkoGrid .ag-cell{display:flex;align-items:center}
+.mieszkoGrid .gridEditLink{font-size:11px;font-weight:700;color:#9f1d23;text-decoration:none}
+.mieszkoGrid .gridEditLink:hover{text-decoration:underline}
+.mieszkoGrid .agQtyCell{font-weight:800;font-size:14px;background:#fffdf6;border-left:1px solid #eee8d8}
+.orderAgGrid{margin-top:0}
+@media(max-width:720px){
+ .mieszkoGrid{--ag-font-size:11px;--ag-cell-horizontal-padding:8px;overflow:auto}
+ .mieszkoGrid .ag-root-wrapper{min-width:720px}
+ .orderAgGrid .ag-root-wrapper{min-width:760px}
+}
