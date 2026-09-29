@@ -596,3 +596,50 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .authCard.loginForm .loginLogo { width:180px; margin-bottom:16px; }
   .authCard.loginForm .loginSubmit { min-height:68px !important; margin-top:30px !important; }
 }
+
+
+/* Head Office orders — clean mobile cards */
+@media (max-width:720px) {
+  .workspace .tableWrap { background:transparent; border:0; box-shadow:none; overflow:visible; }
+  .workspace .data { display:block; }
+  .workspace .data thead { display:none; }
+  .workspace .data tbody { display:grid; gap:12px; }
+  .workspace .data tr {
+    display:grid; grid-template-columns:1fr 1fr; gap:0 18px;
+    padding:16px; background:#fff; border:1px solid var(--line);
+    border-radius:16px; box-shadow:var(--shadow);
+  }
+  .workspace .data td {
+    display:flex; justify-content:space-between; align-items:center;
+    gap:12px; min-height:36px; padding:5px 0; border:0;
+    font-size:14px; text-align:right;
+  }
+  .workspace .data td::before {
+    content:attr(data-label); flex:0 0 auto; font-size:12px;
+    font-weight:750; color:var(--muted); text-align:left;
+  }
+  .workspace .data td > * { text-align:right; }
+  .workspace .data td[data-label="Shop"],
+  .workspace .data td[data-label="Supplier"] {
+    grid-column:1 / -1; font-size:16px;
+  }
+  .workspace .data td[data-label="Shop"] {
+    padding-bottom:7px; border-bottom:1px solid #eef1ef; margin-bottom:3px;
+    font-weight:800;
+  }
+  .workspace .data td[data-label="Supplier"] { margin-bottom:4px; }
+  .workspace .data td[data-label="Order date"],
+  .workspace .data td[data-label="Delivery date"],
+  .workspace .data td[data-label="Products"],
+  .workspace .data td[data-label="Qty"] { display:block; text-align:left; }
+  .workspace .data td[data-label="Order date"]::before,
+  .workspace .data td[data-label="Delivery date"]::before,
+  .workspace .data td[data-label="Products"]::before,
+  .workspace .data td[data-label="Qty"]::before { display:block; margin-bottom:3px; }
+  .workspace .data td[data-label="Email"],
+  .workspace .data td[data-label="Sent by"],
+  .workspace .data td[data-label="Status"] { grid-column:1 / -1; }
+  .workspace .data td[data-label="Email"] { margin-top:5px; padding-top:10px; border-top:1px solid #eef1ef; }
+  .workspace .data td[data-label="Status"] { padding-top:8px; }
+  .workspace .data .status { padding:7px 12px; border-radius:999px; font-size:12px; }
+}
