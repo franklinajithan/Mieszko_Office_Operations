@@ -831,3 +831,59 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
  .workspace .adminStoreForm>.field,.workspace .adminStoreForm>.check,.workspace .adminStoreForm>.wide{grid-column:1}
  .workspace .adminGrid{grid-template-columns:1fr}
 }
+
+
+/* CRM theme v2 — dense business UI, no oversized forms */
+:root{--crm-bg:#f6f7f8;--crm-card:#fff;--crm-border:#e4e7e5;--crm-text:#17201c;--crm-muted:#6f7973}
+.workspace,.shopWorkspace{background:var(--crm-bg)}
+.workspace .content,.shopContent{max-width:1360px}
+.workspace .content{padding:22px 28px 44px}
+.workspace .pageIntro,.shopContent .pageIntro{margin:0 0 14px}
+.workspace .pageIntro h1,.shopContent .pageIntro h1{font-size:20px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.workspace .pageIntro p,.shopContent .pageIntro p{font-size:12px;line-height:1.45;color:var(--crm-muted)}
+.workspace .panel,.shopContent .panel{background:var(--crm-card);border:1px solid var(--crm-border);border-radius:10px;box-shadow:none}
+.workspace .formGrid{padding:14px;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px;align-items:end}
+.workspace .formGrid>.field,.workspace .formGrid>.check,.workspace .formGrid>.wide{grid-column:auto}
+.workspace .field,.shopContent .field{font-size:11px;font-weight:650;gap:5px}
+.workspace input,.workspace select,.workspace textarea,.shopContent input,.shopContent select{min-height:38px;height:38px;padding:7px 10px;border-radius:7px;font-size:13px;border-color:#d9ddda}
+.workspace .check{display:flex;align-items:center;gap:7px;min-height:38px;font-size:12px}
+.workspace .check input{width:16px!important;height:16px!important;min-height:16px!important}
+.workspace .actions.wide{align-self:end}
+.workspace .button,.shopContent .button{min-height:36px;padding:7px 12px;border-radius:7px;font-size:12px;font-weight:650}
+.workspace .adminGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.workspace .adminGrid .adminRow{min-height:108px;padding:13px;border-radius:9px;border-color:var(--crm-border)}
+.workspace .adminGrid .adminRow b{font-size:13px;font-weight:700}
+.workspace .adminGrid .adminRow p{font-size:11px;line-height:1.45}
+.workspace .adminGrid .adminRow .actions{margin-top:10px;padding-top:9px}
+.workspace .adminGrid .adminRow .actions .button{min-height:32px;padding:5px 9px;font-size:11px}
+.workspace .filters{padding:12px;border:1px solid var(--crm-border);border-radius:9px;background:#fff;box-shadow:none}
+.workspace .topbar{min-height:58px;padding-top:0;padding-bottom:0}
+.workspace .topbar .eyebrow{font-size:10px}
+.workspace .topbar strong{font-size:13px}
+.workspace .topbarIdentity{font-size:11px}
+.shell aside{width:220px}
+.shell{grid-template-columns:220px minmax(0,1fr)}
+.shell aside .brand{padding:18px 16px}
+.shell aside nav a,.shell aside .navBottom button{font-size:13px}
+.shopContent{padding:24px 28px 52px}
+.shopContent>.actions{gap:8px}
+.shopContent .orderPageHead h1{font-size:20px}
+.orderEditor .orderTable th{font-size:10px}
+.orderEditor .orderTable td{font-size:12px;padding:9px 12px}
+.orderEditor .orderTable td.productName b{font-size:12px}
+.orderEditor .qtyInput{width:64px;height:36px;min-height:36px;font-size:14px}
+@media(max-width:1100px){
+ .workspace .formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace .adminGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px){
+ .shopContent{padding:18px 16px 96px}
+ .shopContent .pageIntro h1{font-size:19px}
+}
+@media(max-width:720px){
+ .workspace .content{padding:16px 12px 88px}
+ .workspace .formGrid{grid-template-columns:1fr;padding:12px}
+ .workspace .adminGrid{grid-template-columns:1fr}
+ .workspace .pageIntro h1{font-size:19px}
+ .workspace input,.workspace select,.workspace textarea,.shopContent input,.shopContent select{height:42px;min-height:42px}
+}
