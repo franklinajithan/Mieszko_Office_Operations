@@ -1,3 +1,65 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-export default async function Products(){const s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect("/login");const {data:products}=await s.from("products").select("id,item_code,barcode,name,case_size,active,suppliers(name)").order("name");return <main className="simplePage"><div className="pageHead"><div><h1>Products</h1><p>Supplier products can be added later. Orders will automatically use the products assigned to the selected supplier.</p></div><button className="primary">Add product</button></div><div className="history">{products?.length?products.map((p:any)=><div className="historyRow" key={p.id}><div><b>{p.name}</b><span>{p.suppliers?.name} · {p.item_code||"No item code"} · Case {p.case_size}</span></div></div>):<div className="empty">No products yet — ready for your supplier lists.</div>}</div></main>}
+import Link from "next/link";
+import { Banner, EmptyState, PageIntro } from "@/components/ui";
+import { saveProduct, setProductActive } from "@/server/actions/admin";
+import { getProduct, listProducts, listSuppliers } from "@/server/queries";
+
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ edit?: string; q?: string; supplier?: string; notice?: string; error?: string }> }) {
+  const query = await searchParams;
+  const [products, suppliers] = await Promise.all([
+    listProducts({ search: query.q, supplierId: query.supplier }),
+    listSuppliers(),
+  ]);
+  const editing = query.edit ? products.find((product) => product.id === query.edit) || await getProduct(query.edit) : null;
+  return (
+    <>
+      <PageIntro title="Products" text="Item code, EAN, supplier code and product name. Excel import can use those columns plus the supplier name." />
+      <Banner notice={query.notice} error={query.error} />
+      <form className="filters" method="get">
+        <label className="field">Search<input name="q" defaultValue={query.q || ""} placeholder="Item code, EAN, supplier code or name" /></label>
+        <label className="field">Supplier
+          <select name="supplier" defaultValue={query.supplier || ""}>
+            <option value="">All suppliers</option>
+            {suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.name}</option>)}
+          </select>
+        </label>
+        <button className="button primary" type="submit">Search</button>
+      </form>
+      <form className="panel formGrid" action={saveProduct}>
+        <input type="hidden" name="id" value={editing?.id || ""} />
+        <label className="field">Product name<input name="name" defaultValue={editing?.name || ""} required /></label>
+        <label className="field">Supplier
+          <select name="supplier_id" defaultValue={editing?.supplierId || query.supplier || ""} required>
+            <option value="">Choose</option>
+            {suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.name}</option>)}
+          </select>
+        </label>
+        <label className="field">Item code<input name="item_code" defaultValue={editing?.itemCode || ""} /></label>
+        <label className="field">EAN<input name="ean" defaultValue={editing?.ean || ""} /></label>
+        <label className="field">Supplier code<input name="supplier_code" defaultValue={editing?.supplierCode || ""} /></label>
+        <label className="check"><input type="checkbox" name="active" defaultChecked={editing ? editing.active : true} /> Active</label>
+        <div className="actions wide">
+          <button className="button primary" type="submit">{editing ? "Save product" : "Add product"}</button>
+          {editing && <Link className="button secondary" href="/admin/products">Cancel</Link>}
+        </div>
+      </form>
+      <div className="panel" style={{ marginTop: 16 }}>
+        {products.length === 0 ? <EmptyState title="No products" text="No products match this search." /> : products.map((product) => (
+          <div className="adminRow" key={product.id}>
+            <div>
+              <b>{product.name}</b>
+              <p className="muted">{product.supplierName || "No supplier"} · {product.itemCode || "No item code"} · {product.ean || "No EAN"} · {product.active ? "Active" : "Inactive"}</p>
+            </div>
+            <div className="actions">
+              <Link className="button secondary" href={`/admin/products?edit=${product.id}&q=${encodeURIComponent(query.q || "")}&supplier=${query.supplier || ""}`}>Edit</Link>
+              <form action={setProductActive}>
+                <input type="hidden" name="id" value={product.id} />
+                <input type="hidden" name="active" value={product.active ? "false" : "true"} />
+                <button className="button secondary" type="submit">{product.active ? "Deactivate" : "Activate"}</button>
+              </form>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

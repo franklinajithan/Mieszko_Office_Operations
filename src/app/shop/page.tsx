@@ -1,2 +1,17 @@
-import {createClient} from "@/lib/supabase/server";import {redirect} from "next/navigation";import Link from "next/link";
-export default async function Shop(){const s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect("/login");const {data:p}=await s.from("profiles").select("full_name,role,stores(name)").eq("user_id",user.id).single();if(!p)redirect("/login");if(p.role!=="store")redirect("/head-office");const {data:suppliers}=await s.from("suppliers").select("id,name").eq("active",true).order("name");return <main className="simplePage"><p className="eyebrow">STORE ORDERING</p><h1>{(p.stores as any)?.name||"Your shop"}</h1><p>Welcome {p.full_name||"Staff"}. Select a supplier to start an order.</p><div className="supplierGrid">{suppliers?.map(x=><Link className="supplier" href={"/shop/order/"+x.id} key={x.id}><div className="supplierIcon">{x.name.slice(0,2).toUpperCase()}</div><div><b>{x.name}</b><span>Create supplier order</span></div></Link>)}</div><Link href="/orders">View order history</Link></main>}
+import Link from "next/link";
+import { PageIntro } from "@/components/ui";
+import { storeLabel } from "@/lib/format";
+import { requireStore } from "@/server/session";
+
+export default async function ShopHome() {
+  const staff = await requireStore();
+  return (
+    <>
+      <PageIntro title={storeLabel(staff.storeName, staff.storeCode)} text="Create a supplier order for this shop." />
+      <div className="actions">
+        <Link className="button primary" href="/shop/new">Create supplier order</Link>
+        <Link className="button secondary" href="/shop/history">Order history</Link>
+      </div>
+    </>
+  );
+}
