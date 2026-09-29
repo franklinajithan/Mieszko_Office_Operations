@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent, type ICellRendererParams } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry, type ColDef, type CellValueChangedEvent, type ICellRendererParams, type CellKeyDownEvent } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -69,6 +69,20 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
     if (event.colDef.field === "qty" && event.data) update(event.data.id, Number(event.newValue));
   }
 
+  function moveToNextQty(event: CellKeyDownEvent<GridProduct>) {
+    const keyboardEvent = event.event as KeyboardEvent;
+    if (keyboardEvent.key !== "Enter" || event.colDef.field !== "qty" || event.rowIndex == null) return;
+    keyboardEvent.preventDefault();
+    const nextRow = event.rowIndex + 1;
+    if (nextRow >= rows.length) return;
+    event.api.stopEditing();
+    requestAnimationFrame(() => {
+      event.api.ensureIndexVisible(nextRow, "middle");
+      event.api.setFocusedCell(nextRow, "qty");
+      event.api.startEditingCell({ rowIndex: nextRow, colKey: "qty" });
+    });
+  }
+
   return (
     <div className="orderEditor">
       <div className="toolbar">
@@ -87,7 +101,7 @@ export function OrderEditor({ orderId, products }: { orderId: string; products: 
        <div className="ag-theme-quartz mieszkoGrid orderAgGrid" style={{height:Math.min(650, Math.max(300, 80 + rows.length * 42))}}>
          <AgGridReact<GridProduct> theme="legacy" rowData={rows} columnDefs={columns}
            defaultColDef={{sortable:true,filter:true,resizable:true,flex:1,minWidth:100}}
-           rowHeight={50} headerHeight={40} animateRows={false} onCellValueChanged={changed}
+           rowHeight={50} headerHeight={40} animateRows={false} onCellValueChanged={changed} onCellKeyDown={moveToNextQty}
            ensureDomOrder stopEditingWhenCellsLoseFocus />
        </div>}
       <div className="orderBar">
