@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ClipboardList, LogOut, Settings, Users, PackagePlus, Store, Mail, Menu } from "lucide-react";
+import { ClipboardList, LogOut, Settings, Users, PackagePlus, Store, Mail, Home, PlusCircle, History } from "lucide-react";
 import { signOut } from "@/server/actions/auth";
 import type { Staff } from "@/server/session";
 import { NavLink } from "./controls";
@@ -44,12 +44,14 @@ export function OfficeShell({ staff, children }: { staff: Staff; children: React
             <p className="eyebrow">Head Office</p>
             <strong>{staff.fullName}</strong>
           </div>
-          <div className="mobileOfficeActions">
-            {staff.role === "admin" && <a className="button secondary" href="/admin"><Menu size={18} aria-hidden="true" /> Admin</a>}
-            <form action={signOut}><button className="button secondary" type="submit">Sign out</button></form>
-          </div>
+          <div className="topbarIdentity"><span className="onlineDot" />{staff.role === "admin" ? "Administrator" : "Office user"}</div>
         </header>
         <div className="content">{children}</div>
+        <nav className="officeBottomNav" aria-label="Head Office mobile navigation">
+          <NavLink href="/office" exact><ClipboardList size={20} /><span>Orders</span></NavLink>
+          {staff.role === "admin" && <NavLink href="/admin" exact={false}><Settings size={20} /><span>Admin</span></NavLink>}
+          <form action={signOut}><button type="submit"><LogOut size={20} /><span>Sign out</span></button></form>
+        </nav>
       </div>
     </div>
   );
@@ -67,19 +69,16 @@ export function ShopShell({
   return (
     <div className="shopShell">
       <header className="shopHeader">
-        <div>
-          <p className="eyebrow">Mieszko Office Operations</p>
-          <h1>{storeName}</h1>
-          {storeCode && <p>Store {storeCode}</p>}
+        <div className="shopIdentity">
+          <div className="shopAvatar">{storeName.slice(0,1)}</div>
+          <div><p className="eyebrow">Mieszko Orders</p><h1>{storeName}</h1>{storeCode && <p>Store {storeCode}</p>}</div>
         </div>
-        <form action={signOut}>
-          <button className="button secondary" type="submit">Sign out</button>
-        </form>
+        <form action={signOut}><button className="iconButton" type="submit" aria-label="Sign out"><LogOut size={20} /></button></form>
       </header>
       <div className="content">{children}</div>
       <nav className="bottomNav" aria-label="Shop">
-        <NavLink href="/shop/new" exact={false}>New order</NavLink>
-        <a href="/shop/history">Order history</a>
+        <NavLink href="/shop/new" exact={false}><PlusCircle size={21}/><span>New order</span></NavLink>
+        <a href="/shop/history"><History size={21}/><span>History</span></a>
       </nav>
     </div>
   );
