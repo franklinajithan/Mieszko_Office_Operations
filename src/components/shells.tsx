@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ClipboardList, LogOut, Settings, Users, PackagePlus, Store, Mail } from "lucide-react";
+import { ClipboardList, LogOut, Settings, Users, PackagePlus, Store, Mail, Menu } from "lucide-react";
 import { signOut } from "@/server/actions/auth";
 import type { Staff } from "@/server/session";
 import { NavLink } from "./controls";
@@ -44,9 +44,10 @@ export function OfficeShell({ staff, children }: { staff: Staff; children: React
             <p className="eyebrow">Head Office</p>
             <strong>{staff.fullName}</strong>
           </div>
-          <form action={signOut} className="mobileOnly">
-            <button className="button secondary" type="submit">Sign out</button>
-          </form>
+          <div className="mobileOfficeActions">
+            {staff.role === "admin" && <a className="button secondary" href="/admin"><Menu size={18} aria-hidden="true" /> Admin</a>}
+            <form action={signOut}><button className="button secondary" type="submit">Sign out</button></form>
+          </div>
         </header>
         <div className="content">{children}</div>
       </div>
