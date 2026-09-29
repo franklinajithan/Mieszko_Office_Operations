@@ -1,3 +1,4 @@
+import { SuppliersGrid } from "@/components/data-grids";
 import Link from "next/link";
 import { Banner, PageIntro } from "@/components/ui";
 import { saveSupplier, setSupplierActive } from "@/server/actions/admin";
@@ -22,24 +23,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
           {editing && <Link className="button secondary" href="/admin/suppliers">Cancel</Link>}
         </div>
       </form>
-      <div className="adminGrid">
-        {suppliers.map((supplier) => (
-          <div className="adminRow" key={supplier.id}>
-            <div>
-              <b>{supplier.name}</b>
-              <p className="muted">{supplier.active ? "Active" : "Inactive"} · {supplier.orderEmail || "No order email"}</p>
-            </div>
-            <div className="actions">
-              <Link className="button secondary" href={`/admin/suppliers?edit=${supplier.id}`}>Edit</Link>
-              <form action={setSupplierActive}>
-                <input type="hidden" name="id" value={supplier.id} />
-                <input type="hidden" name="active" value={supplier.active ? "false" : "true"} />
-                <button className="button secondary" type="submit">{supplier.active ? "Deactivate" : "Activate"}</button>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
+      <SuppliersGrid suppliers={suppliers} />
     </>
   );
 }
