@@ -9,12 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "16.0.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "@supabase/ssr": "0.7.0",
+    "@supabase/supabase-js": "2.57.4",
     "lucide-react": "^0.468.0",
-    "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.57.4",
+    "next": "16.3.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "resend": "^6.1.0"
   },
   "devDependencies": {
