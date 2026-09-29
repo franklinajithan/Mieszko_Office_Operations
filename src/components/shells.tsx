@@ -67,19 +67,35 @@ export function ShopShell({
   children: ReactNode;
 }) {
   return (
-    <div className="shopShell">
-      <header className="shopHeader">
-        <div className="shopIdentity">
-          <div className="shopAvatar">{storeName.slice(0,1)}</div>
-          <div><p className="eyebrow">Mieszko Orders</p><h1>{storeName}</h1>{storeCode && <p>Store {storeCode}</p>}</div>
+    <div className="shopShell shopAppShell">
+      <aside className="shopDesktopNav">
+        <div className="brand">
+          <div className="mark" aria-hidden="true">{storeName.slice(0,1)}</div>
+          <div><b>{storeName}</b><span>{storeCode ? `Store ${storeCode}` : "Mieszko Orders"}</span></div>
         </div>
-        <form action={signOut}><button className="iconButton" type="submit" aria-label="Sign out"><LogOut size={20} /></button></form>
-      </header>
-      <div className="content">{children}</div>
-      <nav className="bottomNav" aria-label="Shop">
-        <NavLink href="/shop/new" exact={false}><PlusCircle size={21}/><span>New order</span></NavLink>
-        <a href="/shop/history"><History size={21}/><span>History</span></a>
-      </nav>
+        <nav aria-label="Shop desktop navigation">
+          <NavLink href="/shop" exact><span className="navItem"><Home size={18}/>Home</span></NavLink>
+          <NavLink href="/shop/new" exact={false}><span className="navItem"><PlusCircle size={18}/>New order</span></NavLink>
+          <NavLink href="/shop/history" exact={false}><span className="navItem"><History size={18}/>Order history</span></NavLink>
+        </nav>
+        <form action={signOut} className="navBottom">
+          <button type="submit"><LogOut size={18}/>Sign out</button>
+        </form>
+      </aside>
+      <div className="shopWorkspace">
+        <header className="shopHeader">
+          <div className="shopIdentity">
+            <div className="shopAvatar">{storeName.slice(0,1)}</div>
+            <div><p className="eyebrow">Mieszko Orders</p><h1>{storeName}</h1>{storeCode && <p>Store {storeCode}</p>}</div>
+          </div>
+          <form action={signOut}><button className="iconButton" type="submit" aria-label="Sign out"><LogOut size={20}/></button></form>
+        </header>
+        <main className="content shopContent">{children}</main>
+        <nav className="bottomNav" aria-label="Shop">
+          <NavLink href="/shop/new" exact={false}><PlusCircle size={21}/><span>New order</span></NavLink>
+          <NavLink href="/shop/history" exact={false}><History size={21}/><span>History</span></NavLink>
+        </nav>
+      </div>
     </div>
   );
 }
