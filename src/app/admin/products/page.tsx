@@ -43,7 +43,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           {editing && <Link className="button secondary" href="/admin/products">Cancel</Link>}
         </div>
       </form>
-      <div className="panel" style={{ marginTop: 16 }}>
+      <div className="adminGrid">
         {products.length === 0 ? <EmptyState title="No products" text="No products match this search." /> : products.map((product) => (
           <div className="adminRow" key={product.id}>
             <div>
