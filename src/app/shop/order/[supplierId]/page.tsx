@@ -24,9 +24,13 @@ export default async function ShopOrderPage({ params }: { params: Promise<{ supp
   const quantities = new Map(order.lines.map((line) => [line.productId, line.quantity]));
   return (
     <>
-      <p><Link href="/shop/new">Change supplier or date</Link></p>
-      <h1>{supplier.name}</h1>
-      <p className="muted">{storeLabel(staff.storeName, staff.storeCode)} · Delivery {formatUkDate(order.deliveryDate)}</p>
+      <div className="orderPageHead">
+        <div>
+          <Link className="backLink" href="/shop/new">← Change supplier or delivery date</Link>
+          <h1>{supplier.name}</h1>
+          <p>{storeLabel(staff.storeName, staff.storeCode)} · Delivery {formatUkDate(order.deliveryDate)}</p>
+        </div>
+      </div>
       <OrderEditor
         orderId={order.id}
         products={products.map((product) => ({
