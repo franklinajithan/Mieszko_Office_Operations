@@ -28,7 +28,7 @@ export default async function NewOrderPage({ searchParams }: { searchParams: Pro
           <input name="delivery_date" type="date" required />
         </label>
         <div className="actions wide">
-          <button className="button primary" type="submit">Continue</button>
+          <button className="button primary" type="submit" formAction={startOrder}>Continue</button>
         </div>
       </form>
       {suppliers.length === 0 && <p className="muted">No active suppliers are available for this shop.</p>}
