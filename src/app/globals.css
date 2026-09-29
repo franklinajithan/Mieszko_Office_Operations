@@ -422,3 +422,49 @@ aside nav a.active { background: rgba(255,255,255,.09); box-shadow: inset 3px 0 
   .filters label.field { font-size: 12px; }
   .filters input, .filters select { min-height: 46px; padding: 9px 10px; font-size: 15px; }
 }
+
+
+/* Mobile polish: compact, aligned, app-like */
+@media (max-width: 720px) {
+  .shopShell, .workspace { overflow-x: hidden; }
+  .shopShell .content { padding: 18px 14px 112px; }
+  .shopShell .pageIntro {
+    display: block; margin-bottom: 14px;
+  }
+  .shopShell .pageIntro h1 { font-size: 30px; line-height: 1.08; }
+  .shopShell .pageIntro p { margin-top: 5px; font-size: 14px; }
+
+  .shopShell .filters, .workspace .filters {
+    display: grid; grid-template-columns: repeat(2, minmax(0,1fr));
+    width: 100%; gap: 10px; padding: 12px; border-radius: 15px;
+  }
+  .shopShell .filters .field, .workspace .filters .field { min-width: 0; width: 100%; }
+  .shopShell .filters input, .shopShell .filters select,
+  .workspace .filters input, .workspace .filters select {
+    width: 100%; min-width: 0; max-width: 100%; min-height: 46px;
+    padding: 9px 10px; border-radius: 11px;
+  }
+  .shopShell .filters .button, .workspace .filters .button {
+    grid-column: 1 / -1; width: 100%; min-height: 48px;
+  }
+
+  .history, .workspace .data tr {
+    border-radius: 14px;
+  }
+  .history .data td, .workspace .data td {
+    padding: 5px 14px; font-size: 14px; align-items: flex-start;
+  }
+  .history .data td::before, .workspace .data td::before {
+    font-size: 12px; flex: 0 0 42%; text-align: left;
+  }
+  .history .data td > *, .workspace .data td > * { text-align: right; }
+  .history .data tr, .workspace .data tr { padding: 9px 0; }
+
+  .bottomNav { min-height: 68px; }
+  .bottomNav a { min-height: 54px; justify-content: center; }
+}
+@media (max-width: 430px) {
+  .shopShell .filters, .workspace .filters { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .shopHeader { min-height: 72px; }
+  .shopAvatar { width: 40px; height: 40px; }
+}
