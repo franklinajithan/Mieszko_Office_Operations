@@ -1,3 +1,4 @@
+import { ProductsGrid } from "@/components/data-grids";
 import Link from "next/link";
 import { Banner, EmptyState, PageIntro } from "@/components/ui";
 import { saveProduct, setProductActive } from "@/server/actions/admin";
@@ -43,24 +44,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           {editing && <Link className="button secondary" href="/admin/products">Cancel</Link>}
         </div>
       </form>
-      <div className="adminGrid">
-        {products.length === 0 ? <EmptyState title="No products" text="No products match this search." /> : products.map((product) => (
-          <div className="adminRow" key={product.id}>
-            <div>
-              <b>{product.name}</b>
-              <p className="muted">{product.supplierName || "No supplier"} · {product.itemCode || "No item code"} · {product.ean || "No EAN"} · {product.active ? "Active" : "Inactive"}</p>
-            </div>
-            <div className="actions">
-              <Link className="button secondary" href={`/admin/products?edit=${product.id}&q=${encodeURIComponent(query.q || "")}&supplier=${query.supplier || ""}`}>Edit</Link>
-              <form action={setProductActive}>
-                <input type="hidden" name="id" value={product.id} />
-                <input type="hidden" name="active" value={product.active ? "false" : "true"} />
-                <button className="button secondary" type="submit">{product.active ? "Deactivate" : "Activate"}</button>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
+      <ProductsGrid products={products} query={query} />
     </>
   );
 }
