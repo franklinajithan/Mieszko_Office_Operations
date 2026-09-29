@@ -1,3 +1,4 @@
+import { UsersGrid } from "@/components/data-grids";
 import Link from "next/link";
 import { Banner, PageIntro } from "@/components/ui";
 import { formatUkDateTime, roleLabel } from "@/lib/format";
@@ -51,24 +52,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           </form>
         </div>
       )}
-      <div className="adminGrid">
-        {users.map((user) => (
-          <div className="adminRow" key={user.userId}>
-            <div>
-              <b>{user.fullName}</b>
-              <p className="muted">{roleLabel(user.role)} · {user.storeName || "No store"} · {user.active ? "Active" : "Inactive"} · Last activity {formatUkDateTime(user.lastSeenAt)}</p>
-            </div>
-            <div className="actions">
-              <Link className="button secondary" href={`/admin/users?edit=${user.userId}`}>Edit</Link>
-              <form action={setUserActive}>
-                <input type="hidden" name="id" value={user.userId} />
-                <input type="hidden" name="active" value={user.active ? "false" : "true"} />
-                <button className="button secondary" type="submit">{user.active ? "Deactivate" : "Activate"}</button>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
+      <UsersGrid users={users} />
     </>
   );
 }
