@@ -17,10 +17,10 @@ export type EmailResult = {
 
 async function sendWithGmail(message: OutboundEmail) {
   const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_APP_PASSWORD?.replace(/\\s+/g, "");
+  const pass = process.env.SMTP_APP_PASSWORD?.replace(/\s+/g, "");
   if (!user || !pass) return { error: "Email is not configured." };
   try {
-    const transporter = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
+    const transporter = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass }, connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 30000 });
     const sent = await transporter.sendMail({
       from: `Mieszko Operations <${user}>`, to: message.to,
       cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
@@ -28,7 +28,9 @@ async function sendWithGmail(message: OutboundEmail) {
     });
     return { id: sent.messageId ?? null, error: null };
   } catch (error) {
-    const messageText = error instanceof Error ? error.message : "Gmail send failed.";
+    const smtp = error as { message?: string; code?: string; response?: string; responseCode?: number; command?: string };
+    const messageText = smtp?.message || smtp?.response || "Gmail send failed.";
+    console.error("Gmail SMTP send failed", { code: smtp?.code, responseCode: smtp?.responseCode, command: smtp?.command, response: smtp?.response, message: messageText });
     logServerError("order email", messageText);
     return { id: null, error: messageText };
   }
