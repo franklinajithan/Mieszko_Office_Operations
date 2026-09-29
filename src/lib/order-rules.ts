@@ -33,11 +33,12 @@ export function orderSubject(shop: string, supplier: string, deliveryDateLabel: 
 
 export function productMatches(product: {
   name: string;
+  polishName?: string | null;
   itemCode: string | null;
   ean: string | null;
   supplierCode: string | null;
 }, term: string) {
   const query = term.trim().toLowerCase();
   if (!query) return true;
-  return [product.itemCode, product.ean, product.supplierCode, product.name].some((value) => value?.toLowerCase().includes(query));
+  return [product.itemCode, product.ean, product.supplierCode, product.name, product.polishName].some((value) => value?.toLowerCase().includes(query));
 }
