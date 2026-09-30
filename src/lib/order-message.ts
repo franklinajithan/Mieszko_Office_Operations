@@ -84,7 +84,7 @@ export function orderEmailHtml(order: EmailOrder, copy: boolean) {
   const rows=lines.map(line=>`<tr>${visible.map(col=>`<td style="padding:13px 10px;border-bottom:1px solid #e7e9e7;${col.key==="qty"?"text-align:right;font-weight:700":""}">${cell(line,col.key)}</td>`).join("")}</tr>`).join("");
   const address=[order.storeAddressLine1,order.storeAddressLine2,order.storeCity,order.storePostcode].filter(Boolean).map(v=>escapeHtml(String(v))).join("<br>");
   const ref=`PO-${escapeHtml(order.storeCode||"SHOP")}-${escapeHtml(order.id.slice(0,8).toUpperCase())}`;
-  const logo="https://mieszko-office-operations.vercel.app/api/assets/mieszko-logo";
+  const logo="cid:mieszko-logo";
   return `<div style="margin:0;background:#f5f5f3;padding:18px 8px;font-family:Arial,Helvetica,sans-serif;color:#202522">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:720px;background:#ffffff;border:1px solid #e2e4e2;border-radius:12px">
