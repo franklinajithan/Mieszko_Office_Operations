@@ -84,12 +84,10 @@ export function orderEmailHtml(order: EmailOrder, copy: boolean) {
   const rows=lines.map(line=>`<tr>${visible.map(col=>`<td style="padding:13px 10px;border-bottom:1px solid #e7e9e7;${col.key==="qty"?"text-align:right;font-weight:700":""}">${cell(line,col.key)}</td>`).join("")}</tr>`).join("");
   const address=[order.storeAddressLine1,order.storeAddressLine2,order.storeCity,order.storePostcode].filter(Boolean).map(v=>escapeHtml(String(v))).join("<br>");
   const ref=`PO-${escapeHtml(order.storeCode||"SHOP")}-${escapeHtml(order.id.slice(0,8).toUpperCase())}`;
-  const logo="https://mieszko-office-operations.vercel.app/api/assets/mieszko-logo";
   return `<div style="margin:0;background:#f5f5f3;padding:18px 8px;font-family:Arial,Helvetica,sans-serif;color:#202522">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:720px;background:#ffffff;border:1px solid #e2e4e2;border-radius:12px">
     <tr><td style="padding:22px 24px;text-align:center;border-bottom:4px solid #b51f29">
-      <img src="${logo}" alt="Polski Supermarket Mieszko" width="150" style="display:block;width:150px;max-width:45%;height:auto;margin:0 auto 10px">
       <div style="font-size:21px;font-weight:800;letter-spacing:.3px;color:#1c211e">POLSKI SUPERMARKET MIESZKO</div>
       <div style="font-size:12px;letter-spacing:2px;color:#777f7a;margin-top:5px">PURCHASE ORDER</div>
     </td></tr>
