@@ -16,6 +16,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
         <div className="wide"><h2 style={{margin:"0 0 4px"}}>{editing ? `Edit supplier — ${editing.name}` : "Add supplier"}</h2>{!editing && <p className="muted" style={{margin:0}}>Create a new supplier here. To change an existing supplier, tap Edit in the list below.</p>}</div>
         <input type="hidden" name="id" value={editing?.id || ""} />
         <label className="field">Name<input name="name" defaultValue={editing?.name || ""} required /></label>
+        <label className="field">Supplier code<input name="code" defaultValue={editing?.code || ""} placeholder="e.g. PVB" maxLength={6} required /></label>
         <label className="field">Order email<input name="order_email" type="email" defaultValue={editing?.orderEmail || ""} /></label>
         <label className="field wide">CC emails<input name="cc_emails" defaultValue={editing?.ccEmails.join(", ") || ""} placeholder="optional@supplier.co.uk" /></label>
         <div className="wide"><h2 style={{margin:"6px 0 8px"}}>Email columns</h2><p className="muted" style={{margin:"0 0 10px"}}>Choose exactly what this supplier sees in order emails.</p><div className="emailColumnChecks">
