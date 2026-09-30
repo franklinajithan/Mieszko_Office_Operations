@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("mieszko_staff_session")?.value;
-  const isPublic = pathname === "/login" || pathname.startsWith("/session/end");
+  const isPublic = pathname === "/login" || pathname.startsWith("/session/end") || pathname.startsWith("/api/assets/");
   if (!token && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
