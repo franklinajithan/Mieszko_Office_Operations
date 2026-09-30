@@ -17,8 +17,8 @@ function ActionCell({ data }: { data?: Row }) {
   return <div className="gridActions">{data.editHref ? <Link className="gridEditLink" href={String(data.editHref)}>Edit</Link> : null}{action && data.id ? <form action={action}><input type="hidden" name="id" value={String(data.id)} /><input type="hidden" name="active" value={data.active ? "false" : "true"} /><button className="gridActionButton" type="submit">{data.active ? "Deactivate" : "Activate"}</button></form> : null}</div>;
 }
 
-function EditCell({ value }: { value?: string }) {
-  return value ? <Link className="gridEditLink" href={value}>Edit</Link> : null;
+function ViewOrderCell({ value }: { value?: string }) {
+  return value ? <Link className="gridEditLink" href={value}>View order</Link> : null;
 }
 
 export function MieszkoDataGrid({ rows, columns, height = 520 }: { rows: Row[]; columns: ColDef<Row>[]; height?: number }) {
@@ -85,16 +85,17 @@ export function UsersGrid({ users }: { users: any[] }) {
 
 export function OrdersGrid({ orders, hrefBase, mode }: { orders: any[]; hrefBase: string; mode: "shop" | "office" }) {
   const rows = orders.map(o => ({
-    shop:o.storeName || "—", supplier:o.supplierName, orderDate:o.orderDate, deliveryDate:o.deliveryDate,
+    orderNumber:`PO-${o.storeCode || "SHOP"}-${String(o.id).slice(0,8).toUpperCase()}`, shop:o.storeName || "—", supplier:o.supplierName, orderDate:o.orderDate, deliveryDate:o.deliveryDate,
     products:o.products, qty:o.totalQty, email:o.emailStatus, sentBy:o.sentBy || (o.status === "draft" ? "—" : "Unknown"),
-    status:o.status, editHref:`${hrefBase}/${o.id}`
+    status:o.status, viewHref:`${hrefBase}/${o.id}`
   }));
   const columns: ColDef<Row>[] = [
+    {field:"orderNumber",headerName:"Order number",minWidth:185,flex:1.2},
     ...(mode === "office" ? [{field:"shop",headerName:"Shop",minWidth:140} as ColDef<Row>] : []),
     {field:"supplier",headerName:"Supplier",minWidth:170,flex:1.5},{field:"orderDate",headerName:"Order date",minWidth:120},
     {field:"deliveryDate",headerName:"Delivery date",minWidth:120},{field:"products",headerName:"Products",width:95,flex:0},
     {field:"qty",headerName:"Qty",width:80,flex:0},{field:"email",headerName:"Email",minWidth:110},
-    {field:"sentBy",headerName:"Sent by",minWidth:130},{field:"status",headerName:"Status",width:105,flex:0},{field:"editHref"}
+    {field:"sentBy",headerName:"Sent by",minWidth:130},{field:"status",headerName:"Status",width:105,flex:0},{field:"viewHref",headerName:"Actions",width:120,flex:0,sortable:false,filter:false,resizable:false,cellRenderer:ViewOrderCell}
   ];
   return <MieszkoDataGrid rows={rows} columns={columns} height={Math.min(650, 80 + Math.max(rows.length,6)*42)} />;
 }
