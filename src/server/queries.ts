@@ -35,9 +35,15 @@ export type OrderDetail = {
   storeName: string;
   storeCode: string | null;
   storeEmail: string | null;
+  storeAddressLine1: string | null;
+  storeAddressLine2: string | null;
+  storeCity: string | null;
+  storePostcode: string | null;
+  storePhone: string | null;
   supplierName: string;
   supplierEmail: string | null;
   supplierCc: string[];
+  emailColumns: { itemCode:boolean; ean:boolean; supplierCode:boolean; productName:boolean; polishName:boolean; quantity:boolean };
   orderDate: string;
   deliveryDate: string | null;
   status: string;
