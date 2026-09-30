@@ -30,6 +30,7 @@ export type OrderLine = {
 };
 export type OrderDetail = {
   id: string;
+  orderNumber: string;
   storeId: string;
   supplierId: string;
   storeName: string;
@@ -56,6 +57,7 @@ export type OrderDetail = {
 };
 export type OrderListItem = {
   id: string;
+  orderNumber: string;
   orderDate: string;
   deliveryDate: string | null;
   status: string;
@@ -74,6 +76,7 @@ export type StoreRow = { id: string; name: string; code: string | null; email: s
 export type SupplierRow = {
   id: string;
   name: string;
+  code: string | null;
   active: boolean;
   orderEmail: string | null;
   ccEmails: string[];
@@ -169,7 +172,7 @@ export async function supplierAllowedForStore(storeId: string, supplierId: strin
 }
 
 export async function getSupplier(id: string) {
-  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").eq("id", id).maybeSingle();
+  const { data, error } = await db().from("suppliers").select("id, name, code, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").eq("id", id).maybeSingle();
   if (error || !data) return null;
   return mapSupplier(data);
 }
@@ -178,6 +181,7 @@ function mapSupplier(row: Record<string, unknown>): SupplierRow {
   return {
     id: String(row.id),
     name: String(row.name ?? ""),
+    code: text(row.code),
     active: row.active !== false,
     orderEmail: text(row.order_email),
     ccEmails: emailList(row.cc_emails),
@@ -188,7 +192,7 @@ function mapSupplier(row: Record<string, unknown>): SupplierRow {
 }
 
 export async function listSuppliers() {
-  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").order("name");
+  const { data, error } = await db().from("suppliers").select("id, name, code, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").order("name");
   if (error) {
     logServerError("supplier list", error.message);
     return [] as SupplierRow[];
@@ -270,8 +274,8 @@ export async function getProduct(id: string) {
   return mapProduct(chosen.data as Record<string, unknown>);
 }
 
-const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email, address_line_1, address_line_2, city, postcode, phone), suppliers(name, order_email, cc_emails, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code))";
-const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, polish_name, item_code, barcode, supplier_product_code))";
+const ORDER_SELECT = "id, order_number, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email, address_line_1, address_line_2, city, postcode, phone), suppliers(name, order_email, cc_emails, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code))";
+const ORDER_SELECT_BASIC = "id, order_number, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, polish_name, item_code, barcode, supplier_product_code))";
 
 function mapOrder(row: Record<string, unknown>): OrderDetail | null {
   const store = one(row.stores as Embedded<{ name?: string; code?: string | null; email?: string | null; address_line_1?:string|null; address_line_2?:string|null; city?:string|null; postcode?:string|null; phone?:string|null }>);
@@ -295,6 +299,7 @@ function mapOrder(row: Record<string, unknown>): OrderDetail | null {
   if (!row.id || !row.store_id || !row.supplier_id) return null;
   return {
     id: String(row.id),
+    orderNumber: text(row.order_number) || `PO-${text(store?.code)||"SHOP"}-${String(row.id).slice(0,8).toUpperCase()}`,
     storeId: String(row.store_id),
     supplierId: String(row.supplier_id),
     storeName: store?.name || "Store",
@@ -320,6 +325,7 @@ function mapOrder(row: Record<string, unknown>): OrderDetail | null {
 function toListItem(order: OrderDetail): OrderListItem {
   return {
     id: order.id,
+    orderNumber: order.orderNumber,
     orderDate: order.orderDate,
     deliveryDate: order.deliveryDate,
     status: order.status,
