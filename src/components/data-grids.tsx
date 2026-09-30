@@ -85,7 +85,7 @@ export function UsersGrid({ users }: { users: any[] }) {
 
 export function OrdersGrid({ orders, hrefBase, mode }: { orders: any[]; hrefBase: string; mode: "shop" | "office" }) {
   const rows = orders.map(o => ({
-    orderNumber:`PO-${o.storeCode || "SHOP"}-${String(o.id).slice(0,8).toUpperCase()}`, shop:o.storeName || "—", supplier:o.supplierName, orderDate:o.orderDate, deliveryDate:o.deliveryDate,
+    orderNumber:o.orderNumber, shop:o.storeName || "—", supplier:o.supplierName, orderDate:o.orderDate, deliveryDate:o.deliveryDate,
     products:o.products, qty:o.totalQty, email:o.emailStatus, sentBy:o.sentBy || (o.status === "draft" ? "—" : "Unknown"),
     status:o.status, viewHref:`${hrefBase}/${o.id}`
   }));
