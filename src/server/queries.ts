@@ -64,7 +64,7 @@ export type OrderListItem = {
   totalQty: number;
   sentBy: string | null;
 };
-export type StoreRow = { id: string; name: string; code: string | null; email: string | null; active: boolean };
+export type StoreRow = { id: string; name: string; code: string | null; email: string | null; addressLine1: string | null; addressLine2: string | null; city: string | null; postcode: string | null; phone: string | null; active: boolean };
 export type SupplierRow = {
   id: string;
   name: string;
@@ -73,6 +73,7 @@ export type SupplierRow = {
   ccEmails: string[];
   emailEnabled: boolean;
   emailSubjectTemplate: string | null;
+  emailColumns: { itemCode:boolean; ean:boolean; supplierCode:boolean; productName:boolean; polishName:boolean; quantity:boolean };
 };
 export type UserRow = {
   userId: string;
@@ -162,7 +163,7 @@ export async function supplierAllowedForStore(storeId: string, supplierId: strin
 }
 
 export async function getSupplier(id: string) {
-  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template").eq("id", id).maybeSingle();
+  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").eq("id", id).maybeSingle();
   if (error || !data) return null;
   return mapSupplier(data);
 }
@@ -176,11 +177,12 @@ function mapSupplier(row: Record<string, unknown>): SupplierRow {
     ccEmails: emailList(row.cc_emails),
     emailEnabled: row.email_enabled === true,
     emailSubjectTemplate: text(row.email_subject_template),
+    emailColumns: { itemCode: row.email_show_item_code === true, ean: row.email_show_ean === true, supplierCode: row.email_show_supplier_code !== false, productName: row.email_show_product_name !== false, polishName: row.email_show_polish_name === true, quantity: row.email_show_quantity !== false },
   };
 }
 
 export async function listSuppliers() {
-  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template").order("name");
+  const { data, error } = await db().from("suppliers").select("id, name, active, order_email, cc_emails, email_enabled, email_subject_template, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity").order("name");
   if (error) {
     logServerError("supplier list", error.message);
     return [] as SupplierRow[];
@@ -262,12 +264,12 @@ export async function getProduct(id: string) {
   return mapProduct(chosen.data as Record<string, unknown>);
 }
 
-const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email), suppliers(name, order_email, cc_emails), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code))";
+const ORDER_SELECT = "id, order_date, delivery_date, status, email_status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code, email, address_line_1, address_line_2, city, postcode, phone), suppliers(name, order_email, cc_emails, email_show_item_code, email_show_ean, email_show_supplier_code, email_show_product_name, email_show_polish_name, email_show_quantity), order_items(id, cases, quantity, item_code_snapshot, ean_snapshot, supplier_code_snapshot, product_name_snapshot, product_id, products(name, polish_name, item_code, barcode, ean, supplier_code, supplier_product_code))";
 const ORDER_SELECT_BASIC = "id, order_date, status, submitted_at, submitted_by, created_by, created_at, store_id, supplier_id, stores(name, code), suppliers(name, order_email), order_items(id, cases, product_id, products(name, polish_name, item_code, barcode, supplier_product_code))";
 
 function mapOrder(row: Record<string, unknown>): OrderDetail | null {
-  const store = one(row.stores as Embedded<{ name?: string; code?: string | null; email?: string | null }>);
-  const supplier = one(row.suppliers as Embedded<{ name?: string; order_email?: string | null; cc_emails?: unknown }>);
+  const store = one(row.stores as Embedded<{ name?: string; code?: string | null; email?: string | null; address_line_1?:string|null; address_line_2?:string|null; city?:string|null; postcode?:string|null; phone?:string|null }>);
+  const supplier = one(row.suppliers as Embedded<{ name?: string; order_email?: string | null; cc_emails?: unknown; email_show_item_code?:boolean; email_show_ean?:boolean; email_show_supplier_code?:boolean; email_show_product_name?:boolean; email_show_polish_name?:boolean; email_show_quantity?:boolean }>);
   const items = (Array.isArray(row.order_items) ? row.order_items : []) as Record<string, unknown>[];
   const lines = items.map((item) => {
     const product = one(item.products as Embedded<{ name?: string; polish_name?: string | null; item_code?: string | null; barcode?: string | null; ean?: string | null; supplier_code?: string | null; supplier_product_code?: string | null }>);
@@ -292,9 +294,11 @@ function mapOrder(row: Record<string, unknown>): OrderDetail | null {
     storeName: store?.name || "Store",
     storeCode: text(store?.code),
     storeEmail: text(store?.email),
+    storeAddressLine1: text(store?.address_line_1), storeAddressLine2: text(store?.address_line_2), storeCity: text(store?.city), storePostcode: text(store?.postcode), storePhone: text(store?.phone),
     supplierName: supplier?.name || "Supplier",
     supplierEmail: text(supplier?.order_email),
     supplierCc: emailList(supplier?.cc_emails),
+    emailColumns: { itemCode:supplier?.email_show_item_code===true, ean:supplier?.email_show_ean===true, supplierCode:supplier?.email_show_supplier_code!==false, productName:supplier?.email_show_product_name!==false, polishName:supplier?.email_show_polish_name===true, quantity:supplier?.email_show_quantity!==false },
     orderDate: String(row.order_date ?? ""),
     deliveryDate: text(row.delivery_date),
     status: String(row.status ?? "draft"),
@@ -466,7 +470,7 @@ async function insertDraft(payload: Record<string, unknown>) {
 }
 
 export async function listStores() {
-  const primary = await db().from("stores").select("id, name, code, email, active").order("name");
+  const primary = await db().from("stores").select("id, name, code, email, address_line_1, address_line_2, city, postcode, phone, active").order("name");
   const source = primary.error
     ? await db().from("stores").select("id, name, code, active").order("name")
     : primary;
@@ -478,6 +482,7 @@ export async function listStores() {
       name: String(record.name),
       code: text(record.code),
       email: text(record.email),
+      addressLine1:text(record.address_line_1), addressLine2:text(record.address_line_2), city:text(record.city), postcode:text(record.postcode), phone:text(record.phone),
       active: record.active !== false,
     };
   });
