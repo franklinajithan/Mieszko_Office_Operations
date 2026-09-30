@@ -76,37 +76,34 @@ export function orderEmailHtml(order: EmailOrder, copy: boolean) {
   const totals = summarize(lines);
   const cols = order.emailColumns || { itemCode:false, ean:false, supplierCode:true, productName:true, polishName:false, quantity:true };
   const visible = [
-    cols.itemCode && { key:"item", label:"Item Code" },
-    cols.ean && { key:"ean", label:"EAN" },
-    cols.supplierCode && { key:"supplier", label:"Supplier Code" },
-    cols.productName && { key:"product", label:"Product" },
+    cols.itemCode && { key:"item", label:"Item Code" }, cols.ean && { key:"ean", label:"EAN" },
+    cols.supplierCode && { key:"supplier", label:"Supplier Code" }, cols.productName && { key:"product", label:"Product" },
     cols.quantity && { key:"qty", label:"Qty" },
   ].filter(Boolean) as {key:string;label:string}[];
-  const cell = (line: EmailOrderLine, key:string) => key === "item" ? escapeHtml(line.itemCode || "") : key === "ean" ? escapeHtml(line.ean || "") : key === "supplier" ? escapeHtml(line.supplierCode || "") : key === "qty" ? String(line.quantity) : `${escapeHtml(line.name)}${cols.polishName && line.polishName ? `<div style="color:#66736c;font-size:12px;margin-top:3px">${escapeHtml(line.polishName)}</div>` : ""}`;
-  const rows = lines.map(line => `<tr>${visible.map(col => `<td style="padding:12px 10px;border-bottom:1px solid #e5e9e6;${col.key==="qty" ? "text-align:right;font-weight:700" : ""}">${cell(line,col.key)}</td>`).join("")}</tr>`).join("");
-  const address = [order.storeAddressLine1, order.storeAddressLine2, order.storeCity, order.storePostcode].filter(Boolean).map(v=>escapeHtml(String(v))).join("<br>");
-  const ref = `PO-${escapeHtml(order.storeCode || "SHOP")}-${escapeHtml(order.id.slice(0,8).toUpperCase())}`;
-  return `<div style="margin:0;background:#f4f6f5;padding:24px;font-family:Arial,Helvetica,sans-serif;color:#17201b">
-    <div style="max-width:760px;margin:auto;background:#fff;border:1px solid #e1e6e3;border-radius:14px;overflow:hidden">
-      <div style="background:#17211c;color:#fff;padding:24px 28px;display:flex;align-items:center">
-        <div style="display:inline-block;background:#b91f26;color:#fff;font-size:26px;font-weight:800;border-radius:10px;padding:9px 15px;margin-right:14px">M</div>
-        <div style="display:inline-block;vertical-align:top"><div style="font-size:22px;font-weight:800">MIESZKO</div><div style="font-size:12px;letter-spacing:1.4px;color:#d8dfdb">PURCHASE ORDER</div></div>
-      </div>
-      <div style="padding:28px">
-        ${copy ? '<div style="background:#f3f5f4;padding:10px 12px;border-radius:8px;margin-bottom:20px;font-size:13px">Shop copy — PDF purchase order attached.</div>' : ""}
-        <table style="width:100%;border-collapse:collapse;margin-bottom:24px"><tr>
-          <td style="vertical-align:top;width:55%"><div style="font-size:12px;color:#69746e;text-transform:uppercase;font-weight:700;margin-bottom:7px">Deliver to</div><div style="font-size:17px;font-weight:800">Mieszko — ${escapeHtml(order.storeName)}</div><div>Store ${escapeHtml(order.storeCode || "—")}</div>${address ? `<div style="margin-top:6px;color:#4f5b55">${address}</div>` : ""}${order.storePhone ? `<div style="margin-top:4px;color:#4f5b55">${escapeHtml(order.storePhone)}</div>` : ""}</td>
-          <td style="vertical-align:top"><div style="font-size:12px;color:#69746e;text-transform:uppercase;font-weight:700;margin-bottom:7px">Order details</div><b>Reference:</b> ${ref}<br><b>Supplier:</b> ${escapeHtml(order.supplierName)}<br><b>Order date:</b> ${escapeHtml(formatUkDate(order.orderDate))}<br><b>Delivery date:</b> ${escapeHtml(formatUkDate(order.deliveryDate))}</td>
-        </tr></table>
-        <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:14px">
-          <thead><tr style="background:#f3f5f4">${visible.map(col => `<th style="padding:10px;text-align:${col.key==="qty" ? "right" : "left"};font-size:12px;text-transform:uppercase;letter-spacing:.4px">${col.label}</th>`).join("")}</tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div style="margin-top:20px;text-align:right"><b>${totals.products}</b> products&nbsp;&nbsp;·&nbsp;&nbsp;<b>Total quantity: ${totals.quantity}</b></div>
-        <div style="margin-top:28px;padding-top:18px;border-top:1px solid #e5e9e6;color:#66736c;font-size:12px;line-height:1.6">Kind regards,<br><b style="color:#17201b">Mieszko Office Operations</b><br>Polski Supermarket Mieszko<br><br>This purchase order was generated automatically by Mieszko Office Operations.</div>
-      </div>
-    </div>
-  </div>`;
+  const cell=(line:EmailOrderLine,key:string)=>key==="item"?escapeHtml(line.itemCode||""):key==="ean"?escapeHtml(line.ean||""):key==="supplier"?escapeHtml(line.supplierCode||""):key==="qty"?String(line.quantity):`${escapeHtml(line.name)}${cols.polishName&&line.polishName?`<div style="color:#707973;font-size:12px;margin-top:3px">${escapeHtml(line.polishName)}</div>`:""}`;
+  const rows=lines.map(line=>`<tr>${visible.map(col=>`<td style="padding:13px 10px;border-bottom:1px solid #e7e9e7;${col.key==="qty"?"text-align:right;font-weight:700":""}">${cell(line,col.key)}</td>`).join("")}</tr>`).join("");
+  const address=[order.storeAddressLine1,order.storeAddressLine2,order.storeCity,order.storePostcode].filter(Boolean).map(v=>escapeHtml(String(v))).join("<br>");
+  const ref=`PO-${escapeHtml(order.storeCode||"SHOP")}-${escapeHtml(order.id.slice(0,8).toUpperCase())}`;
+  const logo="https://mieszko-office-operations.vercel.app/api/assets/mieszko-logo";
+  return `<div style="margin:0;background:#f5f5f3;padding:18px 8px;font-family:Arial,Helvetica,sans-serif;color:#202522">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:720px;background:#ffffff;border:1px solid #e2e4e2;border-radius:12px">
+    <tr><td style="padding:22px 24px;text-align:center;border-bottom:4px solid #b51f29">
+      <img src="${logo}" alt="Polski Supermarket Mieszko" width="150" style="display:block;width:150px;max-width:45%;height:auto;margin:0 auto 10px">
+      <div style="font-size:21px;font-weight:800;letter-spacing:.3px;color:#1c211e">POLSKI SUPERMARKET MIESZKO</div>
+      <div style="font-size:12px;letter-spacing:2px;color:#777f7a;margin-top:5px">PURCHASE ORDER</div>
+    </td></tr>
+    <tr><td style="padding:24px">
+      ${copy?'<div style="background:#f6f1ed;border-left:4px solid #b51f29;padding:10px 12px;margin-bottom:20px;font-size:13px">Shop copy — PDF purchase order attached.</div>':""}
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:22px">
+        <tr><td style="padding:0 0 18px"><div style="font-size:11px;color:#7a827d;text-transform:uppercase;font-weight:700;letter-spacing:1px">Deliver to</div><div style="font-size:18px;font-weight:800;margin-top:5px">${escapeHtml(order.storeName)}</div><div style="font-size:14px">Mieszko Store ${escapeHtml(order.storeCode||"—")}</div>${address?`<div style="font-size:14px;line-height:1.5;color:#555f59;margin-top:6px">${address}</div>`:""}${order.storePhone?`<div style="font-size:14px;color:#555f59;margin-top:4px">${escapeHtml(order.storePhone)}</div>`:""}</td></tr>
+        <tr><td style="background:#f6f7f6;border-radius:8px;padding:14px 16px"><div style="font-size:11px;color:#7a827d;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:7px">Order details</div><table role="presentation" cellspacing="0" cellpadding="2" style="font-size:14px"><tr><td style="padding-right:16px;color:#69716c">Reference</td><td><b>${ref}</b></td></tr><tr><td style="padding-right:16px;color:#69716c">Supplier</td><td><b>${escapeHtml(order.supplierName)}</b></td></tr><tr><td style="padding-right:16px;color:#69716c">Order date</td><td>${escapeHtml(formatUkDate(order.orderDate))}</td></tr><tr><td style="padding-right:16px;color:#69716c">Delivery date</td><td><b>${escapeHtml(formatUkDate(order.deliveryDate))}</b></td></tr></table></td></tr>
+      </table>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;font-size:14px"><thead><tr style="background:#202722;color:#fff">${visible.map(col=>`<th style="padding:11px 10px;text-align:${col.key==="qty"?"right":"left"};font-size:11px;text-transform:uppercase;letter-spacing:.5px">${col.label}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>
+      <div style="padding:16px 0 4px;text-align:right;font-size:14px"><b>${totals.products}</b> products &nbsp;•&nbsp; <b>Total quantity: ${totals.quantity}</b></div>
+    </td></tr>
+    <tr><td style="background:#202722;color:#dfe3e0;padding:20px 24px;text-align:center;font-size:12px;line-height:1.6"><b style="color:#fff;font-size:13px">POLSKI SUPERMARKET MIESZKO</b><br>Mieszko Office Operations<br>This purchase order was generated automatically. Please quote <b style="color:#fff">${ref}</b> when contacting us.</td></tr>
+  </table></td></tr></table></div>`;
 }
 
 function filenameToken(value: string) {
