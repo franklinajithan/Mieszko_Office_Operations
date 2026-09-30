@@ -239,15 +239,20 @@ export async function saveSupplier(formData: FormData) {
   const staff = await requireAdmin();
   const id = String(formData.get("id") || "");
   const name = String(formData.get("name") || "").trim();
+  const code = String(formData.get("code") || "").trim().toUpperCase();
   const active = formData.get("active") === "on";
   const orderEmail = String(formData.get("order_email") || "").trim();
   const cc = parseEmails(String(formData.get("cc_emails") || ""));
   if (name.length < 2) go("/admin/suppliers", "error", "name");
+  if (!/^[A-Z0-9]{2,6}$/.test(code)) go(id ? `/admin/suppliers?edit=${id}` : "/admin/suppliers", "error", "code");
+  const codeUsed = await db().from("suppliers").select("id").ilike("code", code).maybeSingle();
+  if (codeUsed.data?.id && String(codeUsed.data.id) !== id) go(id ? `/admin/suppliers?edit=${id}` : "/admin/suppliers", "error", "code-used");
   if (cc.error || (orderEmail && parseEmails(orderEmail).error) || parseEmails(orderEmail).emails.length > 1) {
     go(id ? `/admin/suppliers?edit=${id}` : "/admin/suppliers", "error", "email");
   }
   const payload = {
     name,
+    code,
     active,
     email_enabled: Boolean(orderEmail),
     order_email: orderEmail || null,
