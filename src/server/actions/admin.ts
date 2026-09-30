@@ -43,7 +43,7 @@ export async function saveStore(formData: FormData) {
   const parsedEmail = emailRaw ? parseEmails(emailRaw) : { emails: [] as string[] };
   if (parsedEmail.error || parsedEmail.emails.length > 1) go(id ? `/admin/stores?edit=${id}` : "/admin/stores", "error", "email");
   const email = parsedEmail.emails[0] || null;
-  const payload = { name, code, email, active, updated_at: new Date().toISOString() };
+  const payload = { name, code, email, address_line_1:String(formData.get("address_line_1")||"").trim()||null, address_line_2:String(formData.get("address_line_2")||"").trim()||null, city:String(formData.get("city")||"").trim()||null, postcode:String(formData.get("postcode")||"").trim()||null, phone:String(formData.get("phone")||"").trim()||null, active, updated_at: new Date().toISOString() };
   try {
     if (id) await updateFlexible("stores", { id }, payload);
     else await insertFlexible("stores", payload);
@@ -252,6 +252,12 @@ export async function saveSupplier(formData: FormData) {
     email_enabled: Boolean(orderEmail),
     order_email: orderEmail || null,
     cc_emails: cc.emails,
+    email_show_item_code: formData.get("show_item_code") === "on",
+    email_show_ean: formData.get("show_ean") === "on",
+    email_show_supplier_code: formData.get("show_supplier_code") === "on",
+    email_show_product_name: formData.get("show_product_name") === "on",
+    email_show_polish_name: formData.get("show_polish_name") === "on",
+    email_show_quantity: formData.get("show_quantity") === "on",
     updated_at: new Date().toISOString(),
   };
   try {
