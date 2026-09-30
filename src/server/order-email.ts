@@ -8,8 +8,7 @@ import { isMissingRelation, logServerError } from "./errors";
 import { renderOrderPdf } from "./pdf/render-order-pdf";
 import type { OrderDetail } from "./queries";
 import type { Staff } from "./session";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { LOGO as MIESZKO_LOGO_BASE64 } from "@/app/api/assets/mieszko-logo/route";
 
 export type EmailResult = {
   supplierStatus: "sent" | "failed" | "skipped";
@@ -23,8 +22,7 @@ async function sendWithGmail(message: OutboundEmail) {
   if (!user || !pass) return { error: "Email is not configured." };
   try {
     const transporter = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass }, connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 30000 });
-    let logo: Buffer | null = null;
-    try { logo = await readFile(path.join(process.cwd(), "public", "mieszko-logo.png")); } catch { /* email still sends without logo attachment */ }
+    const logo = Buffer.from(MIESZKO_LOGO_BASE64, "base64");
     const sent = await transporter.sendMail({
       from: `Mieszko Operations <${user}>`, to: message.to,
       cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
