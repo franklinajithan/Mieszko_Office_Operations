@@ -61,11 +61,11 @@ export function supplierRecipients(order: EmailOrder) {
 }
 
 export function supplierEmailSubject(order: EmailOrder) {
-  return orderSubject(order.storeName, order.supplierName, formatUkDate(order.deliveryDate));
+  return `${order.orderNumber} - ${orderSubject(order.storeName, order.supplierName, formatUkDate(order.deliveryDate))}`;
 }
 
 export function shopEmailSubject(order: EmailOrder) {
-  return shopCopySubject(order.storeName, order.supplierName, formatUkDate(order.deliveryDate));
+  return `${order.orderNumber} - ${shopCopySubject(order.storeName, order.supplierName, formatUkDate(order.deliveryDate))}`;
 }
 
 function escapeHtml(value: string) {
