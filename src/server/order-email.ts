@@ -8,7 +8,6 @@ import { isMissingRelation, logServerError } from "./errors";
 import { renderOrderPdf } from "./pdf/render-order-pdf";
 import type { OrderDetail } from "./queries";
 import type { Staff } from "./session";
-import { LOGO as MIESZKO_LOGO_BASE64 } from "@/app/api/assets/mieszko-logo/route";
 
 export type EmailResult = {
   supplierStatus: "sent" | "failed" | "skipped";
@@ -22,12 +21,10 @@ async function sendWithGmail(message: OutboundEmail) {
   if (!user || !pass) return { error: "Email is not configured." };
   try {
     const transporter = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass }, connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 30000 });
-    const logo = Buffer.from(MIESZKO_LOGO_BASE64, "base64");
     const sent = await transporter.sendMail({
       from: `Mieszko Operations <${user}>`, to: message.to,
       cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
       attachments: [
-        ...(logo ? [{ filename: "mieszko-logo.jpg", content: logo, cid: "mieszko-logo", contentType: "image/jpeg" }] : []),
         ...message.attachments.map(file => ({ filename: file.filename, content: Buffer.from(file.content) })),
       ],
     });
