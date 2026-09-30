@@ -27,7 +27,7 @@ async function sendWithGmail(message: OutboundEmail) {
       from: `Mieszko Operations <${user}>`, to: message.to,
       cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
       attachments: [
-        ...(logo ? [{ filename: "mieszko-logo.png", content: logo, cid: "mieszko-logo" }] : []),
+        ...(logo ? [{ filename: "mieszko-logo.jpg", content: logo, cid: "mieszko-logo", contentType: "image/jpeg", contentDisposition: "inline" }] : []),
         ...message.attachments.map(file => ({ filename: file.filename, content: Buffer.from(file.content) })),
       ],
     });
