@@ -998,3 +998,11 @@ html,body{width:100%;min-height:100%;margin:0}
  .orderAgGrid .agQtyCell:not(.ag-cell-inline-editing){font-size:17px!important}
  .mobileQtyEditor{font-size:18px;min-height:50px}
 }
+
+
+/* Keep the mobile order screen fitted when the Qty editor receives focus. */
+@media(max-width:720px){
+  html,body{overflow-x:hidden}
+  .orderAgGrid{max-width:100vw;overflow:hidden}
+  .orderAgGrid .mobileQtyEditor{font-size:18px!important;touch-action:manipulation}
+}
