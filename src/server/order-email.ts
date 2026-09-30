@@ -8,6 +8,8 @@ import { isMissingRelation, logServerError } from "./errors";
 import { renderOrderPdf } from "./pdf/render-order-pdf";
 import type { OrderDetail } from "./queries";
 import type { Staff } from "./session";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 export type EmailResult = {
   supplierStatus: "sent" | "failed" | "skipped";
@@ -21,10 +23,15 @@ async function sendWithGmail(message: OutboundEmail) {
   if (!user || !pass) return { error: "Email is not configured." };
   try {
     const transporter = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass }, connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 30000 });
+    let logo: Buffer | null = null;
+    try { logo = await readFile(path.join(process.cwd(), "public", "mieszko-logo.png")); } catch { /* email still sends without logo attachment */ }
     const sent = await transporter.sendMail({
       from: `Mieszko Operations <${user}>`, to: message.to,
       cc: message.cc.length ? message.cc : undefined, subject: message.subject, html: message.html,
-      attachments: message.attachments.map(file => ({ filename: file.filename, content: Buffer.from(file.content) })),
+      attachments: [
+        ...(logo ? [{ filename: "mieszko-logo.png", content: logo, cid: "mieszko-logo" }] : []),
+        ...message.attachments.map(file => ({ filename: file.filename, content: Buffer.from(file.content) })),
+      ],
     });
     return { id: sent.messageId ?? null, error: null };
   } catch (error) {
