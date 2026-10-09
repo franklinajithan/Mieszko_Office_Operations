@@ -19,7 +19,7 @@ finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
 $encodedUser = [Uri]::EscapeDataString($DbUser)
 $encodedPassword = [Uri]::EscapeDataString($password)
 Remove-Variable password -ErrorAction SilentlyContinue
-$env:ORDERING_DATABASE_URL = "postgresql://${encodedUser}:${encodedPassword}@${DbHost}:${DbPort}/${Database}"
+$env:ORDERING_DATABASE_URL = "postgresql://${encodedUser}:${encodedPassword}@${DbHost}:${DbPort}/${Database}?sslmode=disable"
 $env:ORDERING_API_PORT = "4317"
 $env:ORDERING_API_TOKEN = New-RandomHexToken
 $env:ORDERING_APPROVAL_TOKEN = New-RandomHexToken
