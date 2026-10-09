@@ -27,3 +27,15 @@ Use a separate random `ORDERING_APPROVAL_TOKEN` (32+ characters) for approving o
 - `GET /order-drafts`: recent saved drafts with store and net total.
 
 **Security boundary:** The local API currently uses service tokens, not individual staff sessions. The `reviewedBy` value is a supplied label, not verified identity. Before real use, integrate staff role checks and verified audit identities. Do not forward tokens to the Vercel client. The Vercel UI is not connected to this localhost service yet.
+
+## Windows quick start for the new database
+
+After installing the full SQL schema in PostgreSQL 18, open PowerShell inside `ordering/server` and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\\start-local-windows.ps1
+```
+
+Defaults: host `127.0.0.1`, port `5432`, database `mieszko_office`, user `postgres`. The launcher asks for the PostgreSQL password without saving it, installs Node dependencies, generates temporary service tokens and checks the authenticated API health endpoint. Keep the PowerShell window open while using the API. No credentials are written to the repository.
+
+**Important:** This confirms the **local ordering API** can reach PostgreSQL. It does not configure or repair the existing Next.js login (which currently uses Supabase), and does not connect the browser UI to the API. The API is localhost-only; do not expose it to the internet.
