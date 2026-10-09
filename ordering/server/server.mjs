@@ -81,14 +81,14 @@ async function handle(req,res) {
       const {rows}=await pool.query(`SELECT pu.id,pu.filename,pu.uploaded_by,pu.uploaded_at,pu.status,s.name AS supplier,COUNT(pr.id)::int AS line_count FROM office_ordering.price_uploads pu JOIN office_ordering.suppliers s ON s.id=pu.supplier_id LEFT JOIN office_ordering.supplier_prices pr ON pr.upload_id=pu.id GROUP BY pu.id,s.name ORDER BY pu.uploaded_at DESC LIMIT 200`);
       return json(res,200,{batches:rows});
     }
-    if(req.method==="GET"&&/^\\/price-batches\\/\\d+$/.test(req.url||"")){
+    if(req.method==="GET"&&/^\/price-batches\/\d+$/.test(req.url||"")){
       const id=Number(req.url.split("/")[2]);
       const batch=await pool.query(`SELECT pu.id,pu.filename,pu.status,pu.uploaded_by,s.name AS supplier FROM office_ordering.price_uploads pu JOIN office_ordering.suppliers s ON s.id=pu.supplier_id WHERE pu.id=$1`,[id]);
       if(!batch.rowCount)return json(res,404,{error:"Batch not found"});
       const lines=await pool.query(`SELECT sp.supplier_code,p.msp_item_code,pr.net_case_price,sp.units_per_case,pr.currency FROM office_ordering.supplier_prices pr JOIN office_ordering.supplier_products sp ON sp.id=pr.supplier_product_id JOIN office_ordering.products p ON p.id=sp.product_id WHERE pr.upload_id=$1 ORDER BY sp.supplier_code`,[id]);
       return json(res,200,{batch:batch.rows[0],lines:lines.rows});
     }
-    if(req.method==="POST"&&/^\\/price-batches\\/\\d+\\/(approve|reject)$/.test(req.url||"")){
+    if(req.method==="POST"&&/^\/price-batches\/\d+\/(approve|reject)$/.test(req.url||"")){
       const parts=req.url.split("/"),id=Number(parts[2]),action=parts[3],input=await body(req);
       if(!nonblank(input.reviewedBy)||typeof input.note!=="string"||input.note.length>1000)return json(res,400,{error:"Reviewer and note required"});
       if(!approvalToken || approvalToken.length<32)return json(res,503,{error:"Approval disabled: configure separate approval token"});
