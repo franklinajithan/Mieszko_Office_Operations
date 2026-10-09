@@ -1,6 +1,13 @@
 # Mieszko Ordering local API launcher. Run in PowerShell from any directory.
 param([string]$DbHost = "127.0.0.1", [int]$DbPort = 5432, [string]$Database = "mieszko_office", [string]$DbUser = "postgres")
 $ErrorActionPreference = "Stop"
+function New-RandomHexToken {
+  $bytes = New-Object byte[] 32
+  $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+  try { $rng.GetBytes($bytes) } finally { $rng.Dispose() }
+  return ([BitConverter]::ToString($bytes) -replace '-', '').ToLowerInvariant()
+}
+
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $here
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw "Node.js is missing. Install Node.js LTS first." }
@@ -14,8 +21,8 @@ $encodedPassword = [Uri]::EscapeDataString($password)
 Remove-Variable password -ErrorAction SilentlyContinue
 $env:ORDERING_DATABASE_URL = "postgresql://${encodedUser}:${encodedPassword}@${DbHost}:${DbPort}/${Database}"
 $env:ORDERING_API_PORT = "4317"
-$env:ORDERING_API_TOKEN = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
-$env:ORDERING_APPROVAL_TOKEN = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+$env:ORDERING_API_TOKEN = New-RandomHexToken
+$env:ORDERING_APPROVAL_TOKEN = New-RandomHexToken
 Write-Host "Installing local API dependencies..."
 & npm.cmd install --no-audit --no-fund
 if ($LASTEXITCODE -ne 0) { throw "npm install failed" }
