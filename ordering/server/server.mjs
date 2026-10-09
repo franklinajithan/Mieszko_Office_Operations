@@ -9,7 +9,7 @@ const approvalToken = process.env.ORDERING_APPROVAL_TOKEN;
 if (!token || token.length < 32 || !connectionString) {
   throw new Error("Set ORDERING_API_TOKEN (32+ characters) and ORDERING_DATABASE_URL before starting.");
 }
-const pool = new Pool({ connectionString, max: 10, connectionTimeoutMillis: 5000 });
+const pool = new Pool({ connectionString, ssl: false, max: 10, connectionTimeoutMillis: 5000 });
 const json = (res, status, data) => {res.writeHead(status, {"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"});res.end(JSON.stringify(data));};
 function authorized(req) {
   const supplied = req.headers.authorization?.replace(/^Bearer /i,"") || "";
