@@ -76,6 +76,36 @@ async function handle(req,res) {
         await client.query("COMMIT");return json(res,201,{batchId:batch.rows[0].id,status:"pending"});
       }catch(error){await client.query("ROLLBACK");if(/Unknown|Invalid|Unmapped/.test(error.message))return json(res,400,{error:error.message});throw error}finally{client.release()}
     }
+    if(req.method==="GET"&&req.url==="/price-batches"){
+      const {rows}=await pool.query(`SELECT pu.id,pu.filename,pu.uploaded_by,pu.uploaded_at,pu.status,s.name AS supplier,COUNT(pr.id)::int AS line_count FROM office_ordering.price_uploads pu JOIN office_ordering.suppliers s ON s.id=pu.supplier_id LEFT JOIN office_ordering.supplier_prices pr ON pr.upload_id=pu.id GROUP BY pu.id,s.name ORDER BY pu.uploaded_at DESC LIMIT 200`);
+      return json(res,200,{batches:rows});
+    }
+    if(req.method==="GET"&&/^\\/price-batches\\/\\d+$/.test(req.url||"")){
+      const id=Number(req.url.split("/")[2]);
+      const batch=await pool.query(`SELECT pu.id,pu.filename,pu.status,pu.uploaded_by,s.name AS supplier FROM office_ordering.price_uploads pu JOIN office_ordering.suppliers s ON s.id=pu.supplier_id WHERE pu.id=$1`,[id]);
+      if(!batch.rowCount)return json(res,404,{error:"Batch not found"});
+      const lines=await pool.query(`SELECT sp.supplier_code,p.msp_item_code,pr.net_case_price,sp.units_per_case,pr.currency FROM office_ordering.supplier_prices pr JOIN office_ordering.supplier_products sp ON sp.id=pr.supplier_product_id JOIN office_ordering.products p ON p.id=sp.product_id WHERE pr.upload_id=$1 ORDER BY sp.supplier_code`,[id]);
+      return json(res,200,{batch:batch.rows[0],lines:lines.rows});
+    }
+    if(req.method==="POST"&&/^\\/price-batches\\/\\d+\\/(approve|reject)$/.test(req.url||"")){
+      const parts=req.url.split("/"),id=Number(parts[2]),action=parts[3],input=await body(req);
+      if(!nonblank(input.reviewedBy)||typeof input.note!=="string"||input.note.length>1000)return json(res,400,{error:"Reviewer and note required"});
+      const client=await pool.connect();
+      try{
+        await client.query("BEGIN");
+        const result=await client.query("SELECT status FROM office_ordering.price_uploads WHERE id=$1 FOR UPDATE",[id]);
+        if(!result.rowCount){await client.query("ROLLBACK");return json(res,404,{error:"Batch not found"})}
+        if(result.rows[0].status!=="pending"){await client.query("ROLLBACK");return json(res,409,{error:"Batch has already been reviewed"})}
+        if(action==="approve"){
+          const count=await client.query("SELECT COUNT(*)::int AS n FROM office_ordering.supplier_prices WHERE upload_id=$1",[id]);
+          if(count.rows[0].n===0){await client.query("ROLLBACK");return json(res,400,{error:"Cannot approve an empty batch"})}
+        }
+        const status=action==="approve"?"approved":"rejected";
+        await client.query("UPDATE office_ordering.price_uploads SET status=$1 WHERE id=$2",[status,id]);
+        await client.query("INSERT INTO office_ordering.price_approval_audit(upload_id,old_status,new_status,reviewed_by,note) VALUES($1,'pending',$2,$3,$4)",[id,status,input.reviewedBy.trim(),input.note]);
+        await client.query("COMMIT");return json(res,200,{id,status});
+      }catch(error){await client.query("ROLLBACK");throw error}finally{client.release()}
+    }
     return json(res,404,{error:"Not found"});
   }catch(error){console.error(randomUUID(),error);return json(res,500,{error:"Internal server error"})}
 }
