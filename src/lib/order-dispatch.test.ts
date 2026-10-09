@@ -7,6 +7,7 @@ import { resolveTemplateId } from "@/server/pdf/templates/registry";
 function sampleOrder(overrides: Partial<EmailOrder> = {}): EmailOrder {
   return {
     id: "order-0766",
+    orderNumber: "MO-TEST-001",
     storeId: "store-perivale",
     storeName: "Perivale",
     storeCode: "0766",
