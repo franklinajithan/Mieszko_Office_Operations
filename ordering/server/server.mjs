@@ -111,6 +111,59 @@ async function handle(req,res) {
         await client.query("COMMIT");return json(res,200,{id,status});
       }catch(error){await client.query("ROLLBACK");throw error}finally{client.release()}
     }
+    if(req.method==="POST"&&req.url==="/order-drafts"){
+      const input=await body(req);
+      if(!nonblank(input.storeCode)||!Array.isArray(input.lines)||input.lines.length===0||input.lines.length>2000)
+        return json(res,400,{error:"Store code and 1-2000 draft lines required"});
+      const client=await pool.connect();
+      try{
+        await client.query("BEGIN");
+        const store=await client.query("SELECT id FROM office_ordering.stores WHERE store_code=$1",[input.storeCode.trim()]);
+        if(!store.rowCount){await client.query("ROLLBACK");return json(res,400,{error:"Unknown store"})}
+        const seen=new Set();
+        const resolved=[];
+        for(const line of input.lines){
+          if(!nonblank(line.supplier)||!nonblank(line.supplierCode)||!nonblank(line.mspItemCode)||!Number.isSafeInteger(line.cases)||line.cases<=0)
+            throw Object.assign(new Error("Invalid draft line"),{status:400});
+          const key=line.supplier+"|"+line.supplierCode;
+          if(seen.has(key))throw Object.assign(new Error("Duplicate supplier product in store draft"),{status:400});
+          seen.add(key);
+          const offer=await client.query(`SELECT sp.id,sp.units_per_case,p.msp_item_code,
+             (SELECT pr.net_case_price FROM office_ordering.supplier_prices pr
+              JOIN office_ordering.price_uploads pu ON pu.id=pr.upload_id
+              WHERE pr.supplier_product_id=sp.id AND pu.status='approved'
+              ORDER BY pr.effective_at DESC,pr.id DESC LIMIT 1) AS approved_price
+             FROM office_ordering.supplier_products sp
+             JOIN office_ordering.suppliers s ON s.id=sp.supplier_id
+             JOIN office_ordering.products p ON p.id=sp.product_id
+             WHERE s.name=$1 AND sp.supplier_code=$2 AND p.msp_item_code=$3 AND s.active AND sp.active`,
+             [line.supplier,line.supplierCode,line.mspItemCode]);
+          if(!offer.rowCount||offer.rows[0].approved_price===null)
+            throw Object.assign(new Error("No approved supplier offer: "+key),{status:409});
+          resolved.push({id:offer.rows[0].id,cases:line.cases,price:offer.rows[0].approved_price});
+        }
+        const draft=await client.query("INSERT INTO office_ordering.order_drafts(store_id,status) VALUES($1,'draft') RETURNING id",[store.rows[0].id]);
+        for(const line of resolved)await client.query(
+          "INSERT INTO office_ordering.order_lines(order_id,supplier_product_id,cases,locked_net_case_price) VALUES($1,$2,$3,$4)",
+          [draft.rows[0].id,line.id,line.cases,line.price]);
+        await client.query("INSERT INTO office_ordering.order_audit(order_id,event,actor,details) VALUES($1,'created',$2,$3::jsonb)",
+          [draft.rows[0].id,"local-api",JSON.stringify({lineCount:resolved.length,source:"smart-ordering"})]);
+        await client.query("COMMIT");
+        return json(res,201,{orderId:draft.rows[0].id,status:"draft",lineCount:resolved.length});
+      }catch(error){
+        await client.query("ROLLBACK");
+        if(error.status)return json(res,error.status,{error:error.message});
+        throw error;
+      }finally{client.release()}
+    }
+    if(req.method==="GET"&&req.url==="/order-drafts"){
+      const {rows}=await pool.query(`SELECT d.id,d.status,d.created_at,s.store_code,s.name AS store_name,
+       COUNT(l.id)::int AS line_count,COALESCE(SUM(l.cases*l.locked_net_case_price),0) AS net_total
+       FROM office_ordering.order_drafts d JOIN office_ordering.stores s ON s.id=d.store_id
+       LEFT JOIN office_ordering.order_lines l ON l.order_id=d.id
+       GROUP BY d.id,s.id ORDER BY d.created_at DESC LIMIT 200`);
+      return json(res,200,{drafts:rows});
+    }
     return json(res,404,{error:"Not found"});
   }catch(error){console.error(randomUUID(),error);return json(res,500,{error:"Internal server error"})}
 }
