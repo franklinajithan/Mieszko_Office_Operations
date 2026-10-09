@@ -13,3 +13,17 @@ Endpoints: authenticated GET `/health`, GET `/products`, GET `/supplier-offers`,
 All requests require `Authorization: Bearer <ORDERING_API_TOKEN>`. Price batches are stored as **pending** and do not affect approved price selection until a separately audited approval workflow is implemented. No order-sending endpoint exists.
 
 This is a foundation, **not** a production-ready multi-user API. It has no office-user identity/role integration yet. Do not expose port 4317 to the public internet, embed its token in browser JavaScript, or connect Vercel directly to the private office host. A secured office API gateway, staff-level authorisation, migrations and backups are required before deployment.
+
+## Price approval and draft workflow
+
+Apply `ordering/database/003_price_approvals.sql` after migrations 001 and 002.
+
+Use a separate random `ORDERING_APPROVAL_TOKEN` (32+ characters) for approving or rejecting uploaded prices. Approval requests require both the normal bearer token and `X-Approval-Token`. Keep both on the local server, never in browser code.
+
+- `GET /price-batches`: recent uploaded batches and statuses.
+- `GET /price-batches/:id`: review individual mapped price lines.
+- `POST /price-batches/:id/approve` or `/reject`: body `{"reviewedBy":"office reviewer","note":"Checked against supplier list"}`. A batch can be reviewed only once. Audit events are recorded.
+- `POST /order-drafts`: body `{"storeCode":"0365","lines":[{"supplier":"Spizarnia","supplierCode":"SP-1005","mspItemCode":"12345","cases":2}]}`. Requires approved offers; locks case prices in a transaction. **Does not send an order.**
+- `GET /order-drafts`: recent saved drafts with store and net total.
+
+**Security boundary:** The local API currently uses service tokens, not individual staff sessions. The `reviewedBy` value is a supplied label, not verified identity. Before real use, integrate staff role checks and verified audit identities. Do not forward tokens to the Vercel client. The Vercel UI is not connected to this localhost service yet.
