@@ -17,7 +17,7 @@ BEGIN
  IF missing IS NOT NULL THEN RAISE EXCEPTION 'Missing ordering tables: %', missing; END IF;
 
  SELECT string_agg(expected.name, ', ') INTO missing
- FROM (VALUES ('v_approved_supplier_prices'),('v_genuine_wastage'),('v_pending_delivery_units')) AS expected(name)
+ FROM (VALUES ('v_approved_supplier_prices'),('v_genuine_wastage'),('v_pending_delivery_units'),('v_supplier_offer_comparison'),('v_reorder_candidates')) AS expected(name)
  WHERE to_regclass('office_ordering.' || expected.name) IS NULL;
  IF missing IS NOT NULL THEN RAISE EXCEPTION 'Missing ordering views: %', missing; END IF;
 
