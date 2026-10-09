@@ -69,7 +69,8 @@ async function handle(req,res) {
           seen.add(line.supplierCode);
           const sp=await client.query("SELECT id,product_id FROM office_ordering.supplier_products WHERE supplier_id=$1 AND supplier_code=$2",[supplier.rows[0].id,line.supplierCode]);
           if(!sp.rowCount||!sp.rows[0].product_id)throw new Error("Unmapped supplier code: "+line.supplierCode);
-          await client.query("UPDATE office_ordering.supplier_products SET units_per_case=$1 WHERE id=$2",[line.unitsPerCase,sp.rows[0].id]);
+          const sizeCheck=await client.query("SELECT units_per_case FROM office_ordering.supplier_products WHERE id=$1",[sp.rows[0].id]);
+          if(Number(sizeCheck.rows[0].units_per_case)!==line.unitsPerCase)throw new Error("Case size differs from verified mapping: "+line.supplierCode);
           await client.query("INSERT INTO office_ordering.supplier_prices(supplier_product_id,upload_id,net_case_price) VALUES($1,$2,$3)",[sp.rows[0].id,batch.rows[0].id,line.netCasePrice]);
         }
         await client.query("COMMIT");return json(res,201,{batchId:batch.rows[0].id,status:"pending"});
