@@ -5,6 +5,7 @@ import { Pool } from "pg";
 const port = Number(process.env.ORDERING_API_PORT || 4317);
 const token = process.env.ORDERING_API_TOKEN;
 const connectionString = process.env.ORDERING_DATABASE_URL;
+const approvalToken = process.env.ORDERING_APPROVAL_TOKEN;
 if (!token || token.length < 32 || !connectionString) {
   throw new Error("Set ORDERING_API_TOKEN (32+ characters) and ORDERING_DATABASE_URL before starting.");
 }
@@ -90,6 +91,10 @@ async function handle(req,res) {
     if(req.method==="POST"&&/^\\/price-batches\\/\\d+\\/(approve|reject)$/.test(req.url||"")){
       const parts=req.url.split("/"),id=Number(parts[2]),action=parts[3],input=await body(req);
       if(!nonblank(input.reviewedBy)||typeof input.note!=="string"||input.note.length>1000)return json(res,400,{error:"Reviewer and note required"});
+      if(!approvalToken || approvalToken.length<32)return json(res,503,{error:"Approval disabled: configure separate approval token"});
+      const suppliedApproval=Buffer.from(req.headers["x-approval-token"] || "");
+      const expectedApproval=Buffer.from(approvalToken);
+      if(suppliedApproval.length!==expectedApproval.length || !timingSafeEqual(suppliedApproval,expectedApproval))return json(res,403,{error:"Approval permission denied"});
       const client=await pool.connect();
       try{
         await client.query("BEGIN");
