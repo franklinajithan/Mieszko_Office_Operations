@@ -7,6 +7,7 @@ import { renderOrderPdf } from "@/server/pdf/render-order-pdf";
 function orderWith(lines: EmailOrder["lines"], overrides: Partial<EmailOrder> = {}): EmailOrder {
   return {
     id: "9f0c0a6e-2b5d-4c1a-9a11-perivale",
+    orderNumber: "MO-TEST-001",
     storeId: "store-perivale",
     storeName: "Perivale",
     storeCode: "0766",
